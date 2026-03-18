@@ -1,0 +1,1564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>StatSense AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; }
+
+/* ══ AUTH SCREEN ══════════════════════════════════════════ */
+.auth-screen {
+  position: fixed; inset: 0; z-index: 100;
+  background: #0E1C2A;
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity 0.5s ease;
+}
+.auth-screen.hidden { opacity: 0; pointer-events: none; }
+.auth-card {
+  background: #F8F7F4; border-radius: 18px;
+  padding: 38px 38px 32px; width: 100%; max-width: 400px;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.4);
+  animation: authIn 0.5s ease both;
+}
+@keyframes authIn {
+  from { opacity: 0; transform: translateY(14px) scale(.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.auth-logo { display: flex; align-items: center; gap: 9px; margin-bottom: 26px; justify-content: center; }
+.auth-mark {
+  width: 34px; height: 34px; border-radius: 9px;
+  background: linear-gradient(140deg, #0EA5E9, #0369A1);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 12px rgba(14,165,233,0.3);
+}
+.auth-wordmark { font-size: 18px; font-weight: 700; color: #1C1917; letter-spacing: -0.02em; }
+.auth-wordmark em { font-style: normal; color: #0891B2; }
+.auth-title { font-size: 19px; font-weight: 600; color: #1C1917; letter-spacing: -0.02em; margin-bottom: 5px; text-align: center; }
+.auth-sub { font-size: 13px; color: #78716C; text-align: center; line-height: 1.6; margin-bottom: 22px; }
+.auth-google {
+  width: 100%; padding: 11px; border: 1.5px solid #E9E5DF; border-radius: 10px; background: #fff;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  font-family: 'Sora', sans-serif; font-size: 13.5px; font-weight: 500; color: #1C1917;
+  cursor: pointer; transition: all 0.15s; margin-bottom: 16px;
+}
+.auth-google:hover { border-color: #CBD5E0; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+.auth-divider { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+.auth-divider-line { flex: 1; height: 1px; background: #E9E5DF; }
+.auth-divider-txt { font-size: 11px; color: #B5AFA8; font-family: 'DM Mono', monospace; }
+.auth-field { margin-bottom: 11px; }
+.auth-label { display: block; font-size: 12px; font-weight: 500; color: #57534E; margin-bottom: 5px; }
+.auth-input {
+  width: 100%; padding: 10px 13px; border: 1.5px solid #E9E5DF; border-radius: 9px;
+  background: #fff; font-family: 'Sora', sans-serif; font-size: 13.5px; color: #1C1917;
+  outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+}
+.auth-input:focus { border-color: rgba(8,145,178,0.4); box-shadow: 0 0 0 3px rgba(8,145,178,0.09); }
+.auth-input::placeholder { color: #B5AFA8; }
+
+/* Plan selector — Pro marked Coming Soon */
+.plan-row { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-bottom: 18px; }
+.plan-card {
+  border: 1.5px solid #E9E5DF; border-radius: 10px; padding: 11px 13px;
+  cursor: pointer; transition: all 0.15s; background: #fff; position: relative;
+}
+.plan-card.selected { border-color: #0891B2; background: #ECFEFF; box-shadow: 0 0 0 3px rgba(8,145,178,0.08); }
+.plan-card.disabled { opacity: 0.55; cursor: not-allowed; background: #FAFAF9; }
+.plan-name { font-size: 13px; font-weight: 600; color: #1C1917; margin-bottom: 2px; }
+.plan-card.selected .plan-name { color: #0E7490; }
+.plan-price { font-family: 'DM Mono', monospace; font-size: 11px; color: #B5AFA8; }
+.plan-perks { font-size: 11px; color: #78716C; margin-top: 5px; line-height: 1.5; }
+.coming-soon-badge {
+  position: absolute; top: 8px; right: 8px;
+  background: #F0EDE8; border-radius: 4px;
+  font-family: 'DM Mono', monospace; font-size: 9px;
+  color: #78716C; padding: 2px 5px; letter-spacing: 0.04em;
+}
+.auth-btn {
+  width: 100%; padding: 12px; background: #0E7490; border: none; border-radius: 10px;
+  font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 600; color: #fff;
+  cursor: pointer; transition: all 0.15s; margin-bottom: 12px;
+}
+.auth-btn:hover { background: #0891B2; box-shadow: 0 4px 16px rgba(8,145,178,0.28); }
+.auth-switch { text-align: center; font-size: 12.5px; color: #78716C; }
+.auth-switch span { color: #0891B2; cursor: pointer; font-weight: 500; }
+.auth-switch span:hover { text-decoration: underline; }
+.auth-terms { text-align: center; font-size: 11px; color: #B5AFA8; margin-top: 10px; line-height: 1.5; }
+
+/* ══ ROOT ══════════════════════════════════════════════════ */
+:root {
+  --sidebar-w: 232px;
+  --sidebar-bg: #F8F7F4;
+  --line: #E9E5DF;
+  --hover: rgba(14,28,42,0.04);
+  --main-bg: #F8F7F4;
+  --card: #FFFFFF;
+  --border: #E9E5DF;
+  --text: #1C1917;
+  --text-2: #78716C;
+  --text-3: #B5AFA8;
+  --teal: #0891B2;
+  --teal-d: #0E7490;
+  --teal-l: #ECFEFF;
+  --font: 'Sora', sans-serif;
+  --mono: 'DM Mono', monospace;
+}
+
+body {
+  font-family: var(--font);
+  display: flex;
+  height: 100vh;
+  background: #E8E4DF;
+  color: var(--text);
+}
+
+/* ══ SIDEBAR ═══════════════════════════════════════════════ */
+.sidebar {
+  width: var(--sidebar-w);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  transition: width 0.2s ease;
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--border);
+}
+.sidebar.slim { width: 52px; }
+
+.s-logo {
+  height: 54px;
+  display: flex; align-items: center; gap: 9px;
+  padding: 0 13px;
+  border-bottom: 1px solid var(--line);
+  flex-shrink: 0;
+}
+.s-mark {
+  width: 28px; height: 28px; border-radius: 7px;
+  background: linear-gradient(140deg, #0EA5E9, #0369A1);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(14,165,233,0.28);
+}
+.s-wordmark {
+  font-size: 14px; font-weight: 600;
+  color: #1C1917;
+  letter-spacing: -0.01em; white-space: nowrap;
+  transition: opacity 0.18s;
+}
+.s-wordmark em { font-style: normal; color: #0891B2; }
+.sidebar.slim .s-wordmark { opacity: 0; pointer-events: none; }
+.s-toggle {
+  margin-left: auto; flex-shrink: 0;
+  width: 24px; height: 24px; border-radius: 6px;
+  background: transparent; border: none;
+  color: #B5AFA8; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.s-toggle:hover { background: var(--hover); color: #78716C; }
+
+.s-new {
+  margin: 10px 8px 4px;
+  padding: 8px 10px;
+  background: rgba(8,145,178,0.07);
+  border: 1px solid rgba(8,145,178,0.18);
+  border-radius: 8px; color: #0E7490;
+  font-family: var(--font); font-size: 13px; font-weight: 500;
+  cursor: pointer; display: flex; align-items: center; gap: 8px;
+  transition: background 0.15s; white-space: nowrap; overflow: hidden;
+  width: calc(100% - 16px); text-align: left;
+}
+.s-new:hover { background: rgba(14,165,233,0.15); }
+.s-new-icon { flex-shrink: 0; font-size: 13px; line-height: 1; }
+.s-new-lbl  { transition: opacity 0.15s; }
+.sidebar.slim .s-new-lbl { opacity: 0; }
+
+/* Grade level selector */
+.grade-selector {
+  margin: 6px 8px 0;
+  display: flex; gap: 3px;
+  overflow: hidden; transition: opacity 0.15s;
+}
+.sidebar.slim .grade-selector { opacity: 0; pointer-events: none; }
+.grade-btn {
+  flex: 1; padding: 4px 2px; border-radius: 5px; border: none;
+  font-family: var(--mono); font-size: 8.5px; letter-spacing: 0.02em;
+  color: #A8A29E; background: transparent;
+  cursor: pointer; transition: all 0.15s; text-align: center;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.grade-btn:hover { background: var(--hover); color: #57534E; }
+.grade-btn.active {
+  background: rgba(8,145,178,0.1);
+  color: #0E7490;
+  border: 1px solid rgba(14,165,233,0.2);
+}
+
+.s-lbl {
+  font-family: var(--mono); font-size: 9px;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: #C4BFB8;
+  padding: 14px 13px 4px;
+  white-space: nowrap; overflow: hidden;
+  transition: opacity 0.15s;
+}
+.sidebar.slim .s-lbl { opacity: 0; }
+
+.s-item {
+  display: flex; align-items: center; gap: 9px;
+  padding: 7px 10px; margin: 1px 6px;
+  border-radius: 7px;
+  color: #78716C;
+  font-size: 13px;
+  cursor: pointer; background: transparent; border: none;
+  transition: all 0.13s; white-space: nowrap; overflow: hidden;
+  width: calc(100% - 12px); text-align: left;
+  font-family: var(--font);
+}
+.s-item:hover  { background: var(--hover); color: #1C1917; }
+.s-item.active { background: rgba(8,145,178,0.08); color: #0E7490; font-weight: 500; }
+.s-icon { width: 16px; text-align: center; font-size: 14px; flex-shrink: 0; opacity: 0.8; }
+.s-ilbl { transition: opacity 0.15s; }
+.sidebar.slim .s-ilbl { opacity: 0; }
+
+/* Collapsible sidebar sections */
+.s-collapse-hdr {
+  display: flex; align-items: center; gap: 9px;
+  padding: 7px 10px; margin: 1px 6px;
+  border-radius: 7px;
+  color: #78716C; font-size: 13px;
+  cursor: pointer; background: transparent; border: none;
+  transition: all 0.13s; white-space: nowrap; overflow: hidden;
+  width: calc(100% - 12px); text-align: left; font-family: var(--font);
+}
+.s-collapse-hdr:hover { background: var(--hover); color: #1C1917; }
+.s-collapse-hdr.open  { color: #0E7490; }
+.s-chev {
+  margin-left: auto; font-size: 10px; color: #C4BFB8;
+  transition: transform 0.2s; flex-shrink: 0;
+}
+.sidebar.slim .s-chev { opacity: 0; }
+.s-collapse-hdr.open .s-chev { transform: rotate(90deg); }
+
+.s-collapse-body {
+  max-height: 0; overflow: hidden;
+  transition: max-height 0.28s ease;
+}
+.s-collapse-body.open { max-height: 400px; }
+.sidebar.slim .s-collapse-body { max-height: 0; }
+
+/* Big Idea items */
+.big-idea-item {
+  display: flex; align-items: flex-start; gap: 7px;
+  padding: 4px 10px 4px 28px; margin: 0 6px;
+  border-radius: 6px; cursor: pointer;
+  transition: background 0.13s; overflow: hidden;
+}
+.big-idea-item:hover { background: var(--hover); }
+.bi-num {
+  font-family: var(--mono); font-size: 8.5px;
+  color: #C4BFB8; flex-shrink: 0;
+  padding-top: 1px; min-width: 12px;
+}
+.bi-name { font-size: 11.5px; color: #78716C; transition: color 0.13s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.big-idea-item:hover .bi-name { color: #1C1917; }
+
+/* myNotebook items */
+.notebook-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 4px 10px 4px 28px; margin: 0 6px;
+  border-radius: 6px; cursor: pointer;
+  transition: background 0.13s;
+}
+.notebook-item:hover { background: var(--hover); }
+.nb-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+.nb-txt { font-size: 11.5px; color: #78716C; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color 0.13s; }
+.notebook-item:hover .nb-txt { color: #1C1917; }
+.nb-empty { padding: 6px 10px 6px 28px; margin: 0 6px; font-size: 11px; color: #C4BFB8; font-style: italic; }
+
+/* Projects */
+.s-proj {
+  display: flex; align-items: center; gap: 8px;
+  padding: 4px 10px 4px 28px; margin: 0 6px;
+  border-radius: 7px; cursor: pointer; transition: background 0.13s; overflow: hidden;
+}
+.s-proj:hover { background: var(--hover); }
+.s-proj-dot { width: 7px; height: 7px; border-radius: 2px; flex-shrink: 0; }
+.s-proj-name { font-size: 11.5px; color: #78716C; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color 0.13s; }
+.s-proj:hover .s-proj-name { color: #1C1917; }
+.s-proj-stage { margin-left: auto; flex-shrink: 0; font-family: var(--mono); font-size: 8.5px; color: #C4BFB8; }
+
+/* Grounding indicator */
+.s-ground {
+  margin: 4px 8px 0; padding: 6px 10px; border-radius: 7px;
+  background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.12);
+  display: none; align-items: center; gap: 7px;
+  transition: opacity 0.15s;
+}
+.s-ground.on { display: flex; }
+.sidebar.slim .s-ground { opacity: 0; pointer-events: none; }
+.s-gdot { width: 5px; height: 5px; border-radius: 50%; background: #10B981; flex-shrink: 0; }
+.s-gtxt { font-size: 11px; color: #78716C; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Plan badge */
+.s-plan-badge {
+  margin: 6px 8px 0; padding: 8px 10px; border-radius: 8px;
+  background: rgba(0,0,0,0.03); border: 1px solid var(--border);
+  overflow: hidden; transition: opacity 0.15s;
+}
+.sidebar.slim .s-plan-badge { opacity: 0; pointer-events: none; }
+.plan-badge-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; }
+.plan-badge-name { font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: 0.09em; color: #A8A29E; }
+.plan-badge-count { font-family: var(--mono); font-size: 9px; color: #B5AFA8; }
+.plan-bar-bg { height: 3px; border-radius: 2px; background: #E9E5DF; margin-bottom: 7px; }
+.plan-bar-fill { height: 100%; border-radius: 2px; background: #0891B2; width: 40%; transition: width 0.4s ease; }
+.plan-upgrade-btn {
+  width: 100%; padding: 5px 0;
+  background: rgba(8,145,178,0.12);
+  border: 1px solid rgba(8,145,178,0.2); border-radius: 6px;
+  font-family: var(--font); font-size: 11px; font-weight: 500;
+  color: #0E7490; cursor: pointer; transition: all 0.15s;
+}
+.plan-upgrade-btn:hover { background: rgba(8,145,178,0.12); }
+
+.s-recents {
+  flex: 1; overflow-y: auto; padding-bottom: 8px;
+  scrollbar-width: none;
+}
+.s-recents::-webkit-scrollbar { display: none; }
+
+.s-rec {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 10px; margin: 1px 6px;
+  border-radius: 7px; cursor: pointer;
+  transition: background 0.13s; overflow: hidden;
+  width: calc(100% - 12px);
+}
+.s-rec:hover { background: var(--hover); }
+.s-rdot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+.s-rname {
+  font-size: 12px; color: #A8A29E;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  transition: color 0.13s;
+}
+.s-rec:hover .s-rname { color: #57534E; }
+
+.s-footer {
+  border-top: 1px solid var(--border);
+  padding: 8px 6px; flex-shrink: 0;
+}
+.s-user {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 8px; border-radius: 7px;
+  cursor: pointer; transition: background 0.13s; overflow: hidden;
+}
+.s-user:hover { background: var(--hover); }
+.s-av {
+  width: 27px; height: 27px; border-radius: 7px;
+  background: linear-gradient(135deg, #1E3A5F, #0369A1);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.88);
+  flex-shrink: 0;
+}
+.s-uname {
+  font-size: 12.5px; color: #57534E;
+  transition: opacity 0.15s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.sidebar.slim .s-uname { opacity: 0; }
+
+/* ══ MAIN ═══════════════════════════════════════════════════ */
+.main {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column;
+  background: var(--main-bg);
+  border-radius: 14px 0 0 14px;
+  overflow: hidden;
+  position: relative;
+}
+canvas#anim {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  pointer-events: none; z-index: 0;
+}
+
+/* ══ WELCOME ════════════════════════════════════════════════ */
+.welcome {
+  flex: 1;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 0 24px 80px;
+  position: relative; z-index: 1;
+}
+.welcome.gone { display: none; }
+.w-logo {
+  width: 40px; height: 40px; border-radius: 11px;
+  background: linear-gradient(140deg, #0EA5E9, #0369A1);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 18px;
+  box-shadow: 0 4px 16px rgba(14,165,233,0.2);
+  animation: up 0.5s ease both;
+}
+.w-h {
+  font-size: 17px; font-weight: 600; letter-spacing: -0.02em;
+  color: var(--text); text-align: center;
+  margin-bottom: 8px;
+  animation: up 0.5s 0.06s ease both;
+}
+.w-sub {
+  font-size: 13.5px; color: var(--text-2);
+  text-align: center; line-height: 1.7;
+  max-width: 380px;
+  animation: up 0.5s 0.11s ease both;
+}
+@keyframes up {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ══ CONVERSATION ════════════════════════════════════════════ */
+.conv {
+  flex: 1; overflow-y: auto; display: none;
+  padding: 24px 0 8px; position: relative; z-index: 1;
+  scrollbar-width: thin; scrollbar-color: #E9E5DF transparent;
+}
+.conv.on { display: block; }
+.conv-wrap { max-width: 680px; margin: 0 auto; padding: 0 24px; }
+.user-msg { display: flex; justify-content: flex-end; margin-bottom: 16px; }
+.user-bub {
+  background: #0E7490; color: #fff; border-radius: 13px 13px 3px 13px;
+  padding: 10px 15px; font-size: 14px; line-height: 1.55; max-width: 80%;
+}
+.ai-msg { display: flex; gap: 11px; margin-bottom: 20px; }
+.ai-av {
+  width: 28px; height: 28px; border-radius: 8px;
+  background: linear-gradient(140deg, #0EA5E9, #0369A1);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 2px;
+}
+.ai-bub {
+  flex: 1; font-size: 14px; line-height: 1.65; color: var(--text);
+  padding-top: 4px;
+}
+.ai-bub p { margin-bottom: 10px; }
+.ai-bub p:last-child { margin-bottom: 0; }
+.ai-bub strong { color: var(--text); }
+.stage-pill {
+  display: flex; align-items: center; gap: 6px;
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.08em;
+  color: rgba(8,145,178,0.6); text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.spip { width: 5px; height: 5px; border-radius: 50%; background: #0891B2; opacity: 0.6; }
+.typing { display: flex; gap: 11px; margin-bottom: 16px; }
+.tdots { display: flex; gap: 5px; align-items: center; padding: 12px 14px; background: #fff; border-radius: 11px; border: 1px solid var(--border); }
+.tdot { width: 5px; height: 5px; border-radius: 50%; background: #CBD5E0; animation: dot 1.2s ease-in-out infinite; }
+.tdot:nth-child(2) { animation-delay: 0.16s; }
+.tdot:nth-child(3) { animation-delay: 0.32s; }
+@keyframes dot { 0%,80%,100% { transform: scale(1); opacity: .4; } 40% { transform: scale(1.2); opacity: 1; } }
+.interp {
+  background: var(--teal-l); border: 1px solid rgba(8,145,178,0.12);
+  border-left: 3px solid var(--teal); border-radius: 8px;
+  padding: 11px 14px; font-size: 13px; color: #0C4A6E;
+  margin: 12px 0; line-height: 1.6;
+}
+.drills { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 12px; }
+.drill {
+  padding: 6px 14px; border: 1px solid var(--border); border-radius: 20px;
+  background: var(--card); font-family: var(--font); font-size: 12.5px;
+  color: var(--text-2); cursor: pointer; transition: all 0.15s;
+}
+.drill:hover { background: var(--teal-l); border-color: var(--teal); color: var(--teal-d); }
+.chart-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 10px; padding: 16px; margin: 12px 0;
+}
+.chart-meta { font-family: var(--mono); font-size: 10px; color: var(--text-3); margin-bottom: 10px; }
+@keyframes barIn { from { transform: scaleY(0); transform-origin: bottom; } to { transform: scaleY(1); } }
+.c-bar { animation: barIn 0.5s ease both; }
+
+/* ══ INPUT ═══════════════════════════════════════════════════ */
+.input-area {
+  flex-shrink: 0;
+  padding: 10px 28px 20px;
+  position: relative; z-index: 1;
+  background: transparent;
+}
+.input-inner { max-width: 640px; margin: 0 auto; animation: up 0.5s 0.15s ease both; }
+.input-box {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06), 0 6px 20px rgba(0,0,0,0.04);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  overflow: hidden;
+}
+.input-box:focus-within {
+  border-color: rgba(8,145,178,0.35);
+  box-shadow: 0 0 0 3px rgba(8,145,178,0.08), 0 1px 4px rgba(0,0,0,0.06);
+}
+.input-row {
+  display: flex; align-items: flex-end;
+  padding: 13px 12px 11px 17px; gap: 8px;
+}
+.input-ta {
+  flex: 1; border: none; outline: none; resize: none;
+  font-family: var(--font); font-size: 14.5px;
+  color: var(--text); background: transparent;
+  line-height: 1.55; min-height: 24px; max-height: 140px;
+}
+.input-ta::placeholder { color: var(--text-3); }
+.input-acts { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.btn-attach {
+  width: 32px; height: 32px; border-radius: 8px;
+  border: 1px solid var(--border); background: transparent;
+  color: var(--text-3); cursor: pointer; font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.btn-attach:hover { background: var(--main-bg); color: var(--text-2); }
+.btn-send {
+  width: 34px; height: 34px; border-radius: 9px;
+  background: var(--teal-d); border: none;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0;
+  transition: background 0.15s, box-shadow 0.15s;
+  box-shadow: 0 1px 4px rgba(7,89,133,0.2);
+}
+.btn-send:hover { background: var(--teal); box-shadow: 0 2px 10px rgba(8,145,178,0.32); }
+.chips-row {
+  padding: 0 15px 12px;
+  border-top: 1px solid #F0ECE6;
+  display: flex; flex-wrap: wrap; gap: 6px; padding-top: 9px;
+}
+.chip {
+  padding: 5px 12px; background: var(--main-bg); border: 1px solid var(--border);
+  border-radius: 16px; font-size: 12px; color: var(--text-2);
+  cursor: pointer; transition: all 0.13s; white-space: nowrap;
+}
+.chip:hover { background: var(--teal-l); border-color: var(--teal); color: var(--teal-d); }
+.chip-hint {
+  text-align: center; font-family: var(--mono); font-size: 9.5px;
+  color: var(--text-3); margin-top: 8px;
+}
+
+/* ══ 10 BIG IDEAS MODAL ════════════════════════════════════ */
+.big-idea-modal-bg {
+  display: none; position: fixed; inset: 0; z-index: 80;
+  background: rgba(14,28,42,0.7); align-items: center; justify-content: center;
+  backdrop-filter: blur(4px);
+}
+.big-idea-modal-bg.show { display: flex; }
+.bi-modal {
+  background: var(--main-bg); border-radius: 16px;
+  padding: 28px 28px 24px; width: 100%; max-width: 460px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  animation: authIn 0.3s ease both;
+  max-height: 90vh; overflow-y: auto;
+}
+.bi-modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 6px;
+}
+.bi-modal-title { font-size: 16px; font-weight: 600; color: var(--text); letter-spacing: -0.02em; }
+.bi-modal-sub { font-size: 12.5px; color: var(--text-2); line-height: 1.5; margin-bottom: 18px; }
+.bi-modal-concept {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 12px 14px; border-radius: 10px;
+  background: var(--teal-l); border: 1px solid rgba(8,145,178,0.14);
+  margin-bottom: 16px;
+}
+.bi-num-lg {
+  font-family: var(--mono); font-size: 11px; color: var(--teal);
+  font-weight: 600; flex-shrink: 0; padding-top: 1px;
+}
+.bi-modal-name { font-size: 15px; font-weight: 600; color: #0C4A6E; }
+.bi-modal-tagline { font-size: 12.5px; color: #0E7490; margin-top: 3px; }
+.bi-modal-body { font-size: 13.5px; color: var(--text-2); line-height: 1.65; margin-bottom: 16px; }
+.bi-modal-btn {
+  width: 100%; padding: 10px; background: var(--teal-d); border: none; border-radius: 9px;
+  font-family: var(--font); font-size: 13.5px; font-weight: 600; color: #fff;
+  cursor: pointer; transition: all 0.15s; margin-bottom: 8px;
+}
+.bi-modal-btn:hover { background: var(--teal); }
+.bi-modal-close {
+  width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 9px;
+  background: transparent; font-family: var(--font); font-size: 13px;
+  color: var(--text-2); cursor: pointer; transition: all 0.15s;
+}
+.bi-modal-close:hover { background: #F0EDE8; }
+.bi-x {
+  background: none; border: none; cursor: pointer;
+  color: var(--text-3); font-size: 18px; padding: 0; line-height: 1;
+}
+
+/* ══ myNOTEBOOK PANEL ═══════════════════════════════════════ */
+.notebook-panel-bg {
+  display: none; position: fixed; inset: 0; z-index: 80;
+  background: rgba(14,28,42,0.5); align-items: flex-end; justify-content: center;
+  backdrop-filter: blur(3px);
+}
+.notebook-panel-bg.show { display: flex; }
+.nb-panel {
+  background: var(--card); border-radius: 16px 16px 0 0;
+  padding: 24px 28px 28px; width: 100%; max-width: 680px;
+  max-height: 70vh; overflow-y: auto;
+  box-shadow: 0 -8px 40px rgba(0,0,0,0.15);
+  animation: slideUp 0.28s ease both;
+}
+@keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.nb-panel-header {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;
+}
+.nb-panel-title { font-size: 16px; font-weight: 600; color: var(--text); }
+.nb-panel-sub { font-size: 12.5px; color: var(--text-2); margin-bottom: 14px; line-height: 1.5; }
+.nb-entry {
+  padding: 12px 14px; border-radius: 9px;
+  background: var(--main-bg); border: 1px solid var(--border);
+  margin-bottom: 9px;
+}
+.nb-entry-topic {
+  font-size: 11px; font-weight: 600; color: var(--teal-d);
+  text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px;
+  font-family: var(--mono);
+}
+.nb-entry-body { font-size: 13.5px; color: var(--text); line-height: 1.6; }
+.nb-empty-state {
+  text-align: center; padding: 36px 0;
+  font-size: 13.5px; color: var(--text-3); line-height: 1.7;
+}
+.nb-panel-close {
+  padding: 9px 20px; border: 1px solid var(--border); border-radius: 8px;
+  background: transparent; font-family: var(--font); font-size: 13px;
+  color: var(--text-2); cursor: pointer; margin-top: 12px;
+}
+.nb-panel-close:hover { background: var(--main-bg); }
+
+/* ══ PRO MODAL (Coming Soon) ════════════════════════════════ */
+.pro-modal-bg { display: none; position: fixed; inset: 0; z-index: 90; background: rgba(14,28,42,0.7); align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+.pro-modal-bg.show { display: flex; }
+.pro-modal { background: var(--main-bg); border-radius: 16px; padding: 28px; width: 100%; max-width: 360px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); animation: authIn 0.3s ease both; text-align: center; }
+.pro-modal-emoji { font-size: 32px; margin-bottom: 12px; }
+.pro-modal-title { font-size: 17px; font-weight: 600; color: var(--text); letter-spacing: -0.02em; margin-bottom: 8px; }
+.pro-modal-sub { font-size: 13px; color: var(--text-2); line-height: 1.65; margin-bottom: 20px; }
+.pro-modal-soon {
+  background: #FFFBEB; border: 1px solid rgba(217,119,6,0.2); border-radius: 9px;
+  padding: 10px 14px; font-size: 12.5px; color: #92400E; margin-bottom: 16px;
+  font-family: var(--mono);
+}
+.pro-modal-close-btn { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 9px; background: transparent; font-family: var(--font); font-size: 13.5px; color: var(--text-2); cursor: pointer; }
+.pro-modal-close-btn:hover { background: #F0EDE8; }
+
+</style>
+</head>
+<body>
+
+<!-- ══ AUTH SCREEN ══════════════════════════════════════════ -->
+<div class="auth-screen" id="auth-screen">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="auth-mark">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <rect x="1"   y="11" width="3" height="6"  rx="1" fill="white" opacity=".7"/>
+          <rect x="5.5" y="7"  width="3" height="10" rx="1" fill="white" opacity=".85"/>
+          <rect x="10"  y="3"  width="3" height="14" rx="1" fill="white"/>
+          <rect x="14.5"y="8"  width="3" height="9"  rx="1" fill="white" opacity=".65"/>
+        </svg>
+      </div>
+      <div class="auth-wordmark">Stat<em>Sense</em> AI</div>
+    </div>
+
+    <!-- Sign Up View -->
+    <div id="auth-signup-view">
+      <div class="auth-title">Start learning stats.</div>
+      <div class="auth-sub">Your AI statistics coach — powered by the CCDC-M Framework.<br><span style="font-size:11.5px;color:#B5AFA8;">Beta: email only — no password needed yet.</span></div>
+      <button class="auth-google" onclick="signInWithGoogle()">
+        <svg width="16" height="16" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        Continue with Google
+      </button>
+      <div class="auth-divider">
+        <div class="auth-divider-line"></div>
+        <div class="auth-divider-txt">or email</div>
+        <div class="auth-divider-line"></div>
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Email</label>
+        <input class="auth-input" id="auth-email" type="email" placeholder="your@email.com" autocomplete="email"/>
+      </div>
+      <div class="auth-field" style="margin-bottom:16px">
+        <label class="auth-label" style="margin-bottom:6px">I am a…</label>
+        <div class="plan-row" style="margin-bottom:0">
+          <div class="plan-card selected" id="level-student" onclick="selectLevel('student')">
+            <div class="plan-name">Student</div>
+            <div class="plan-perks">K-12 or college learner</div>
+          </div>
+          <div class="plan-card" id="level-teacher" onclick="selectLevel('teacher')">
+            <div class="plan-name">Educator</div>
+            <div class="plan-perks">Teacher or instructor</div>
+          </div>
+        </div>
+      </div>
+      <div class="plan-row" style="margin-bottom:18px">
+        <div class="plan-card selected" id="plan-free" onclick="selectPlan('free')">
+          <div class="plan-name">Free</div>
+          <div class="plan-price">$0 / mo</div>
+          <div class="plan-perks">5 sessions/day · core topics</div>
+        </div>
+        <div class="plan-card disabled" id="plan-pro" title="Coming soon — collecting feedback first">
+          <div class="coming-soon-badge">Coming soon</div>
+          <div class="plan-name">Pro</div>
+          <div class="plan-price">$9 / mo</div>
+          <div class="plan-perks">Unlimited · projects · uploads</div>
+        </div>
+      </div>
+      <button class="auth-btn" onclick="signUp()">Enter with Email — Free</button>
+      <div class="auth-switch">Already have an account? <span onclick="showLogin()">Sign in</span></div>
+      <div class="auth-terms">By continuing you agree to our Terms of Service and Privacy Policy.</div>
+    </div>
+
+    <!-- Sign In View -->
+    <div id="auth-login-view" style="display:none">
+      <div class="auth-title">Welcome back.</div>
+      <div class="auth-sub">Enter your email to continue. No password needed yet.</div>
+      <button class="auth-google" onclick="signInWithGoogle()">
+        <svg width="16" height="16" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        Continue with Google
+      </button>
+      <div class="auth-divider">
+        <div class="auth-divider-line"></div>
+        <div class="auth-divider-txt">or email</div>
+        <div class="auth-divider-line"></div>
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Email</label>
+        <input class="auth-input" id="login-email" type="email" placeholder="your@email.com" autocomplete="email"/>
+      </div>
+
+      <button class="auth-btn" onclick="signIn()">Sign In</button>
+      <div class="auth-switch">New here? <span onclick="showSignup()">Create a free account</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ BIG IDEA MODAL ════════════════════════════════════════ -->
+<div class="big-idea-modal-bg" id="bi-modal-bg">
+  <div class="bi-modal">
+    <div class="bi-modal-header">
+      <div class="bi-modal-title" id="bi-modal-title">Big Idea</div>
+      <button class="bi-x" onclick="closeBigIdea()">✕</button>
+    </div>
+    <div class="bi-modal-sub">One of the 10 conceptual pillars that hold all of statistics together.</div>
+    <div class="bi-modal-concept">
+      <div class="bi-num-lg" id="bi-modal-num">#1</div>
+      <div>
+        <div class="bi-modal-name" id="bi-modal-name">Variability</div>
+        <div class="bi-modal-tagline" id="bi-modal-tagline">Data varies — and that is why statistics exists.</div>
+      </div>
+    </div>
+    <div class="bi-modal-body" id="bi-modal-body"></div>
+    <button class="bi-modal-btn" id="bi-modal-explore-btn">Explore this idea with StatSense →</button>
+    <button class="bi-modal-close" onclick="closeBigIdea()">Close</button>
+  </div>
+</div>
+
+<!-- ══ myNOTEBOOK PANEL ══════════════════════════════════════ -->
+<div class="notebook-panel-bg" id="nb-panel-bg">
+  <div class="nb-panel">
+    <div class="nb-panel-header">
+      <div class="nb-panel-title">📓 myNotebook</div>
+      <button class="bi-x" onclick="closeNotebook()">✕</button>
+    </div>
+    <div class="nb-panel-sub">Key ideas captured from your StatSense AI sessions — organized for review.</div>
+    <div id="nb-entries">
+      <div class="nb-empty-state">
+        Nothing captured yet.<br>
+        As you explore concepts, StatSense AI will save key insights here automatically.
+      </div>
+    </div>
+    <button class="nb-panel-close" onclick="closeNotebook()">Close Notebook</button>
+  </div>
+</div>
+
+<!-- ══ PRO MODAL ═════════════════════════════════════════════ -->
+<div class="pro-modal-bg" id="pro-modal">
+  <div class="pro-modal">
+    <div class="pro-modal-emoji">🚀</div>
+    <div class="pro-modal-title">Pro is coming soon</div>
+    <div class="pro-modal-sub">We are in feedback mode — gathering insights from real students before we launch Pro. Right now, everything is Free.</div>
+    <div class="pro-modal-soon">Expected launch: after beta feedback round</div>
+    <button class="pro-modal-close-btn" onclick="closeProModal()">Got it — keep learning free</button>
+  </div>
+</div>
+
+<!-- ══ SIDEBAR ═══════════════════════════════════════════════ -->
+<aside class="sidebar" id="sidebar">
+
+  <div class="s-logo">
+    <div class="s-mark">
+      <svg width="14" height="14" viewBox="0 0 18 18" fill="none">
+        <rect x="1"   y="11" width="3" height="6"  rx="1" fill="white" opacity=".7"/>
+        <rect x="5.5" y="7"  width="3" height="10" rx="1" fill="white" opacity=".85"/>
+        <rect x="10"  y="3"  width="3" height="14" rx="1" fill="white"/>
+        <rect x="14.5"y="8"  width="3" height="9"  rx="1" fill="white" opacity=".65"/>
+      </svg>
+    </div>
+    <div class="s-wordmark">Stat<em>Sense</em> AI</div>
+    <button class="s-toggle" onclick="toggleSidebar()" title="Toggle sidebar">
+      <svg id="tog-icon" width="14" height="14" viewBox="0 0 24 24" fill="none">
+        <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+
+  <button class="s-new" onclick="resetWelcome()">
+    <span class="s-new-icon">✦</span>
+    <span class="s-new-lbl">New session</span>
+  </button>
+
+  <!-- Grade Level -->
+  <div class="grade-selector" id="grade-selector">
+    <button class="grade-btn" id="grade-elem" onclick="setGrade('elementary')">Elem</button>
+    <button class="grade-btn" id="grade-mid" onclick="setGrade('middle')">Middle</button>
+    <button class="grade-btn active" id="grade-high" onclick="setGrade('high')">High</button>
+    <button class="grade-btn" id="grade-college" onclick="setGrade('college')">College</button>
+  </div>
+
+  <!-- Course Material -->
+  <div class="s-ground" id="s-ground">
+    <div class="s-gdot"></div>
+    <div class="s-gtxt" id="s-gtxt">No file</div>
+  </div>
+
+  <!-- 10 Big Ideas -->
+  <button class="s-collapse-hdr" id="bi-hdr" onclick="toggleCollapse('bi')">
+    <span class="s-icon">💡</span>
+    <span class="s-ilbl">10 Big Ideas</span>
+    <span class="s-chev">›</span>
+  </button>
+  <div class="s-collapse-body" id="bi-body">
+    <div class="big-idea-item" onclick="openBigIdea(0)"><div class="bi-num">1</div><div class="bi-name">Variability</div></div>
+    <div class="big-idea-item" onclick="openBigIdea(1)"><div class="bi-num">2</div><div class="bi-name">Distribution</div></div>
+    <div class="big-idea-item" onclick="openBigIdea(2)"><div class="bi-num">3</div><div class="bi-name">Central Tendency</div></div>
+    <div class="big-idea-item" onclick="openBigIdea(3)"><div class="bi-num">4</div><div class="bi-name">Spread</div></div>
+    <div class="big-idea-item" onclick="openBigIdea(4)"><div class="bi-num">5</div><div class="bi-name">Sampling</div></div>
+    <div class="big-idea-item" onclick="openBigIdea(5)"><div class="bi-num">6</div><div class="bi-name">Randomness</div></div>
+    <div class="big-idea-item" onclick="openBigIdea(6)"><div class="bi-num">7</div><div class="bi-name">Probability</div></div>
+    <div class="big-idea-item" onclick="openBigIdea(7)"><div class="bi-num">8</div><div class="bi-name">Inference</div></div>
+    <div class="big-idea-item" onclick="openBigIdea(8)"><div class="bi-num">9</div><div class="bi-name">Association vs. Causation</div></div>
+    <div class="big-idea-item" onclick="openBigIdea(9)"><div class="bi-num">10</div><div class="bi-name">Models & Assumptions</div></div>
+  </div>
+
+  <!-- myNotebook -->
+  <button class="s-collapse-hdr" id="nb-hdr" onclick="openNotebook()">
+    <span class="s-icon">📓</span>
+    <span class="s-ilbl">myNotebook</span>
+    <span class="s-chev" style="transform:rotate(0deg)">›</span>
+  </button>
+
+  <!-- My Materials -->
+  <button class="s-item" id="materials-btn" onclick="document.getElementById('file-input').click()">
+    <span class="s-icon">📁</span>
+    <span class="s-ilbl">My Materials</span>
+  </button>
+
+  <!-- Projects -->
+  <button class="s-collapse-hdr" id="proj-hdr" onclick="toggleCollapse('proj')">
+    <span class="s-icon">🔬</span>
+    <span class="s-ilbl">Projects</span>
+    <span class="s-chev">›</span>
+  </button>
+  <div class="s-collapse-body" id="proj-body">
+    <div class="s-proj">
+      <div class="s-proj-dot" style="background:#0891B2"></div>
+      <div class="s-proj-name">Sleep & GPA Study</div>
+      <div class="s-proj-stage">Context</div>
+    </div>
+    <div class="s-proj">
+      <div class="s-proj-dot" style="background:#10B981"></div>
+      <div class="s-proj-name">School Lunch Choices</div>
+      <div class="s-proj-stage">Drills</div>
+    </div>
+  </div>
+
+  <!-- Recent -->
+  <div class="s-lbl">Recent</div>
+  <div class="s-recents">
+    <div class="s-rec"><div class="s-rdot" style="background:#0EA5E9"></div><div class="s-rname">Mean vs. Median</div></div>
+    <div class="s-rec"><div class="s-rdot" style="background:#D97706"></div><div class="s-rname">Reading Histograms</div></div>
+    <div class="s-rec"><div class="s-rdot" style="background:#10B981"></div><div class="s-rname">What is a p-value?</div></div>
+    <div class="s-rec"><div class="s-rdot" style="background:#8B5CF6"></div><div class="s-rname">Normal Distribution</div></div>
+  </div>
+
+  <div class="s-footer">
+    <div class="s-plan-badge">
+      <div class="plan-badge-top">
+        <div class="plan-badge-name" id="plan-badge-name">Free</div>
+        <div class="plan-badge-count" id="plan-badge-count">2 / 5 sessions</div>
+      </div>
+      <div class="plan-bar-bg"><div class="plan-bar-fill" id="plan-bar-fill" style="width:40%"></div></div>
+      <button class="plan-upgrade-btn" onclick="showProModal()">Pro coming soon ✦</button>
+    </div>
+    <button class="s-item" style="margin:4px 0 2px"><span class="s-icon">⚙️</span><span class="s-ilbl">Settings</span></button>
+    <div class="s-user" id="s-user">
+      <div class="s-av" id="s-av">?</div>
+      <div class="s-uname" id="s-uname">Loading…</div>
+    </div>
+  </div>
+</aside>
+
+<!-- ══ MAIN ══════════════════════════════════════════════════ -->
+<main class="main">
+
+  <canvas id="anim"></canvas>
+
+  <!-- WELCOME -->
+  <div class="welcome" id="welcome">
+    <div class="w-logo">
+      <svg width="21" height="21" viewBox="0 0 18 18" fill="none">
+        <rect x="1"   y="11" width="3" height="6"  rx="1" fill="white" opacity=".7"/>
+        <rect x="5.5" y="7"  width="3" height="10" rx="1" fill="white" opacity=".85"/>
+        <rect x="10"  y="3"  width="3" height="14" rx="1" fill="white"/>
+        <rect x="14.5"y="8"  width="3" height="9"  rx="1" fill="white" opacity=".7"/>
+      </svg>
+    </div>
+    <h1 class="w-h" id="w-h">Data is everywhere.<br>Few people can truly read it.</h1>
+  </div>
+
+  <!-- CONVERSATION -->
+  <div class="conv" id="conv">
+    <div class="conv-wrap" id="conv-wrap"></div>
+  </div>
+
+  <!-- INPUT -->
+  <div class="input-area">
+    <div class="input-inner">
+      <div class="input-box">
+        <div class="input-row">
+          <textarea class="input-ta" id="ta" rows="1"
+            placeholder="Ask about any graph, concept, dataset, or stats problem…"
+            oninput="autoResize(this)" onkeydown="onKey(event)"></textarea>
+          <div class="input-acts">
+            <button class="btn-attach" onclick="document.getElementById('file-input').click()" title="Upload course material">📎</button>
+            <button class="btn-send" onclick="submit()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                <path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"
+                  stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="chips-row" id="chips"></div>
+      </div>
+      <div class="chip-hint" id="chip-hint">StatSense AI · CCDC-M Framework · statsense.ai</div>
+    </div>
+    <input type="file" id="file-input" accept=".pdf,.docx,.pptx,.txt,.csv,.png,.jpg" onchange="handleFile(this)" style="display:none"/>
+  </div>
+
+</main>
+
+<script>
+/* ════════════════════════════════════════════════════════════
+   10 BIG IDEAS DATA  (Dr. Fadipe / MAT 1260)
+════════════════════════════════════════════════════════════ */
+const BIG_IDEAS = [
+  {
+    name: 'Variability',
+    tagline: 'Data varies — and that is why statistics exists.',
+    body: 'If every student scored exactly 75 on every test, we would not need statistics. But they do not. Heights vary. Opinions vary. Outcomes vary. Statistics is the science of understanding, measuring, and making sense of that variation. Variability is not noise — it is the signal.',
+    prompt: 'Teach me about Variability using the CCDC-M framework — start with a real-world context before any formula.'
+  },
+  {
+    name: 'Distribution',
+    tagline: 'How data spreads out tells a story.',
+    body: 'When we collect data, it takes a shape. Some values are common, others rare. That shape — the distribution — reveals patterns: Is it symmetric? Skewed? Are there outliers? Learning to see distributions is like learning to read. Once you can, you see stories in every dataset.',
+    prompt: 'Help me understand distributions — what do different shapes tell us about the data?'
+  },
+  {
+    name: 'Central Tendency',
+    tagline: 'Where is the "typical" value?',
+    body: 'We often want to summarize data with a single typical number. Mean, median, and mode each tell a different story about where the center lies. Knowing which measure to use — and when — is a crucial skill. The animated dot plot on this welcome screen shows you exactly why it matters.',
+    prompt: 'Explain mean, median, and mode — and show me a visual that captures when each one misleads.'
+  },
+  {
+    name: 'Spread',
+    tagline: 'How far from the center?',
+    body: 'Two groups can have the same average but look completely different. How tightly clustered or widely spread the data is tells us about consistency and reliability. Range, IQR, and standard deviation each measure this spread — and each tells a different part of the story.',
+    prompt: 'Teach me about spread — range, IQR, and standard deviation — with a real example.'
+  },
+  {
+    name: 'Sampling',
+    tagline: 'The part can tell us about the whole.',
+    body: 'We rarely measure entire populations. Instead, we study samples — small, carefully chosen slices. A chef tastes a spoonful of soup to judge the whole pot. But if the soup is not stirred, that spoonful might mislead. How we sample determines how much we can trust our conclusions.',
+    prompt: 'Walk me through sampling — what makes a good sample and what can go wrong?'
+  },
+  {
+    name: 'Randomness',
+    tagline: 'Chaos has structure.',
+    body: 'A single coin flip is unpredictable. But flip 1,000 coins, and you will get close to 500 heads. Random processes, repeated many times, produce predictable patterns. This is the foundation of statistical inference: order emerges from randomness. That is not magic — it is mathematics.',
+    prompt: 'Show me how randomness leads to predictable patterns — use a simulation or example.'
+  },
+  {
+    name: 'Probability',
+    tagline: 'The language of uncertainty.',
+    body: 'There is a 70% chance of rain — probability gives us a way to talk precisely about uncertain events. It is the mathematical language for risk, chance, and confidence. Understanding probability means understanding how much to trust — or doubt — any statistical claim.',
+    prompt: 'Introduce me to probability with a real-world scenario I can reason through.'
+  },
+  {
+    name: 'Inference',
+    tagline: 'From sample to population.',
+    body: 'The ultimate goal: using what we observe in a sample to draw conclusions about a larger population. Confidence intervals and hypothesis tests are tools for saying: based on this sample, here is what I believe about the whole — with this level of certainty. Inference is where statistics earns its power.',
+    prompt: 'Explain statistical inference — what are confidence intervals and hypothesis tests trying to do?'
+  },
+  {
+    name: 'Association vs. Causation',
+    tagline: 'Correlation ≠ causation.',
+    body: 'Ice cream sales and drowning deaths both rise in summer. Does ice cream cause drowning? Obviously not — a third variable, hot weather, drives both. Statistics can reveal relationships, but proving causation requires more than correlation. Watch out for hidden third variables — they are everywhere.',
+    prompt: 'Teach me the difference between association and causation with a surprising real example.'
+  },
+  {
+    name: 'Models & Assumptions',
+    tagline: 'We simplify reality to understand it.',
+    body: 'Every statistical method rests on assumptions: the data is random, the distribution is normal, observations are independent. When assumptions hold, the tools work beautifully. When they do not, results can mislead. A good statistician always asks: what am I assuming, and is that reasonable?',
+    prompt: 'Help me understand statistical models and assumptions — what can go wrong when we ignore them?'
+  }
+];
+
+/* ════════════════════════════════════════════════════════════
+   GRADE LEVEL CONFIG
+════════════════════════════════════════════════════════════ */
+const GRADE_CONFIG = {
+  elementary: {
+    welcome: 'Let\'s explore data together!',
+    sub: 'Ask a question about numbers, charts, or data.<br>StatSense makes it simple and fun.',
+    placeholder: 'What does this chart mean? Ask anything about data…',
+    chips: [
+      ['What is a bar chart?', 'Explain what a bar chart is with a fun real-world example.'],
+      ['What does average mean?', 'Explain what average means using something kids understand.'],
+      ['Show me a picture graph', 'Show me how to read a picture graph step by step.'],
+      ['Why do we collect data?', 'Why do people collect data? Give me a fun real example.'],
+    ]
+  },
+  middle: {
+    welcome: 'Data tells stories. Let\'s read them.',
+    sub: 'Ask about graphs, averages, probability, or any data concept.<br>Start with a question — StatSense coaches you step by step.',
+    placeholder: 'Ask about mean, median, graphs, probability, or anything data…',
+    chips: [
+      ['Mean vs. Median', 'Explain mean and median — when do they tell different stories?'],
+      ['Read a box plot', 'Help me read a box plot — what is each part telling me?'],
+      ['Probability basics', 'Introduce me to probability with a real-world example.'],
+      ['What is correlation?', 'Explain correlation — does it mean one thing causes another?'],
+    ]
+  },
+  high: {
+    welcome: 'Data is everywhere. Few people can truly read it.',
+    sub: 'Ask a question, explore a graph, or pick a concept below.<br>StatSense AI coaches — it never just gives answers.',
+    placeholder: 'Ask about any graph, concept, dataset, or stats problem…',
+    chips: [
+      ['Start with a graph', 'Start with a graph — show me a visual and walk me through it.'],
+      ['Teach me a concept', 'Teach me a concept using the CCDC-M framework — context first.'],
+      ['Quiz me', 'Quiz me — one question at a time with coaching feedback.'],
+      ['Explore a dataset', 'Help me explore and interpret a dataset.'],
+    ]
+  },
+  college: {
+    welcome: 'Stats. Understood. Mastered.',
+    sub: 'Upload your syllabus or notes, then ask anything.<br>CCDC-M framework: Context → Concept → Drills → Challenge → Mastery.',
+    placeholder: 'Ask about inference, regression, distributions, hypothesis testing…',
+    chips: [
+      ['p-value intuition', 'Build my intuition for p-values — context first, formula after.'],
+      ['Regression deep dive', 'Walk me through simple linear regression using real data.'],
+      ['Hypothesis test setup', 'Help me set up a hypothesis test from scratch.'],
+      ['Confidence intervals', 'Explain confidence intervals — what does 95% really mean?'],
+    ]
+  }
+};
+
+let currentGrade = 'high';
+
+function setGrade(g) {
+  currentGrade = g;
+  ['elementary','middle','high','college'].forEach(k => {
+    document.getElementById('grade-'+k.slice(0,k==='college'?7:k==='elementary'?4:k==='middle'?3:4))
+    ?.classList.remove('active');
+  });
+  // simplified id mapping
+  const idMap = {elementary:'elem',middle:'mid',high:'high',college:'college'};
+  document.getElementById('grade-'+idMap[g])?.classList.add('active');
+  applyGradeConfig(g);
+}
+
+function applyGradeConfig(g) {
+  const cfg = GRADE_CONFIG[g];
+  if (!cfg) return;
+  const wh = document.getElementById('w-h');
+  const ws = document.getElementById('w-sub');
+  const ta = document.getElementById('ta');
+  if (wh) wh.innerHTML = cfg.welcome;
+  if (ta) ta.placeholder = cfg.placeholder;
+  buildChips(g);
+}
+
+function buildChips(g) {
+  const cfg = GRADE_CONFIG[g];
+  const el = document.getElementById('chips');
+  if (!el || !cfg) return;
+  el.innerHTML = cfg.chips.map(([label, prompt]) =>
+    `<div class="chip" onclick="go(${JSON.stringify(prompt)})">${label}</div>`
+  ).join('');
+}
+
+/* ════════════════════════════════════════════════════════════
+   CANVAS ANIMATION — Mean vs Median Dot Plot
+════════════════════════════════════════════════════════════ */
+const canvas = document.getElementById('anim');
+const ctx    = canvas.getContext('2d');
+let W, H;
+
+function resizeCanvas() {
+  W = canvas.width  = canvas.offsetWidth;
+  H = canvas.height = canvas.offsetHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+const VALS = [5,6,6,7,7,7,8,8,8,8,9,9,10,11];
+const OUTLIER_VAL = 42;
+const LOOP = 15;
+const regularSum   = VALS.reduce((s,v)=>s+v,0);
+const regularMean  = regularSum / VALS.length;
+const regularMedian= (VALS[6] + VALS[7]) / 2;
+const fullMean     = (regularSum + OUTLIER_VAL) / (VALS.length + 1);
+const fullMedian   = VALS[7];
+const SCALE_MIN = 0, SCALE_MAX = 48;
+function valToX(val,cx,span) { return cx-span/2+((val-SCALE_MIN)/(SCALE_MAX-SCALE_MIN))*span; }
+const STACK_GAP = 12;
+const stackCounts = {};
+VALS.forEach(v=>{ stackCounts[v]=(stackCounts[v]||0)+1; });
+const stackIdx = {};
+const DOT_STACK_OFFSET = VALS.map(v=>{
+  stackIdx[v]=stackIdx[v]||0;
+  const count=stackCounts[v], idx=stackIdx[v]++;
+  return (idx-(count-1)/2)*STACK_GAP;
+});
+const DOTS = VALS.map((val,i)=>({ val, stackOffsetY:DOT_STACK_OFFSET[i], sx:.05+Math.random()*.9, sy:.1+Math.random()*.8 }));
+const AMBIENT = Array.from({length:36},()=>({
+  x:Math.random(),y:Math.random(),vx:(Math.random()-.5)*.00018,vy:(Math.random()-.5)*.00018,
+  r:Math.random()*1.6+.4,a:Math.random()*.07+.02,c:Math.random()>.55?'#0891B2':'#94A3B8'
+}));
+function lerp(a,b,t){return a+(b-a)*t;}
+function easeIO(t){return t<.5?2*t*t:-1+(4-2*t)*t;}
+function clamp(t,lo=0,hi=1){return Math.max(lo,Math.min(hi,t));}
+function pct(e,s,en){return easeIO(clamp((e-s)/(en-s)));}
+function label(text,x,y,color,alpha,size=10){
+  ctx.save();ctx.globalAlpha=alpha;ctx.fillStyle=color;
+  ctx.font=`${size}px DM Mono,monospace`;ctx.textAlign='center';
+  ctx.fillText(text,x,y);ctx.restore();
+}
+function vLine(x,y1,y2,color,alpha,dash=[]){
+  ctx.save();ctx.globalAlpha=alpha;ctx.strokeStyle=color;ctx.lineWidth=1.5;
+  ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(x,y1);ctx.lineTo(x,y2);ctx.stroke();ctx.restore();
+}
+let startTime=null;
+function frame(ts){
+  requestAnimationFrame(frame);
+  if(!startTime)startTime=ts;
+  const elapsed=((ts-startTime)/1000)%LOOP;
+  ctx.clearRect(0,0,W,H);
+  const cx=W*.5,cy=H*.56,span=Math.min(W*.72,520),DOT_R=5;
+  AMBIENT.forEach(d=>{
+    d.x+=d.vx;d.y+=d.vy;
+    if(d.x<0)d.x=1;if(d.x>1)d.x=0;if(d.y<0)d.y=1;if(d.y>1)d.y=0;
+    ctx.beginPath();ctx.arc(d.x*W,d.y*H,d.r,0,Math.PI*2);
+    ctx.fillStyle=d.c;ctx.globalAlpha=d.a;ctx.fill();ctx.globalAlpha=1;
+  });
+  const gatherT=pct(elapsed,3.5,7.0),meanT=pct(elapsed,5.5,7.5),
+        outlierT=pct(elapsed,7.0,10.5),medianT=pct(elapsed,8.0,10.0),
+        axisT=pct(elapsed,3.5,6.0);
+  if(axisT>0){
+    ctx.save();ctx.strokeStyle=`rgba(100,116,139,${axisT*.14})`;ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(valToX(SCALE_MIN,cx,span)-8,cy+14);ctx.lineTo(valToX(SCALE_MAX,cx,span)+8,cy+14);ctx.stroke();
+    [5,10,15,20,25,30,35,40,45].forEach(v=>{
+      const x=valToX(v,cx,span);ctx.beginPath();ctx.moveTo(x,cy+10);ctx.lineTo(x,cy+18);ctx.stroke();
+    });
+    ctx.restore();
+    if(axisT>.5)[5,10,15,20].forEach(v=>label(String(v),valToX(v,cx,span),cy+28,'#B5AFA8',axisT*.5));
+    if(outlierT>.6)label('42',valToX(42,cx,span),cy+28,'#D97706',(outlierT-.6)*2.5*.5);
+  }
+  DOTS.forEach(d=>{
+    const tx=valToX(d.val,cx,span),ty=cy-d.stackOffsetY,fx=d.sx*W,fy=d.sy*H;
+    const x=lerp(fx,tx,gatherT),y=lerp(fy,ty,gatherT);
+    const alpha=elapsed<3.5?.28+(elapsed/3.5)*.15:lerp(.43,.75,gatherT);
+    ctx.beginPath();ctx.arc(x,y,DOT_R,0,Math.PI*2);ctx.fillStyle='#0891B2';ctx.globalAlpha=alpha;ctx.fill();ctx.globalAlpha=1;
+  });
+  if(outlierT>0){
+    const tx=valToX(OUTLIER_VAL,cx,span),ox=lerp(W*.96,tx,outlierT),oy=cy;
+    ctx.beginPath();ctx.arc(ox,oy,DOT_R+.5,0,Math.PI*2);ctx.fillStyle='#D97706';ctx.globalAlpha=outlierT*.85;ctx.fill();ctx.globalAlpha=1;
+    if(outlierT>.65)label('outlier',ox,oy-14,'#D97706',(outlierT-.65)/.35*.55);
+  }
+  const meanWithoutX=valToX(regularMean,cx,span),meanWithX=valToX(fullMean,cx,span);
+  if(meanT>0){
+    const meanX=lerp(meanWithoutX,meanWithX,outlierT),mAlpha=meanT*.3;
+    vLine(meanX,cy-32,cy+14,'#0891B2',mAlpha,[5,4]);
+    if(meanT>.3){
+      const val=lerp(regularMean,fullMean,outlierT).toFixed(1);
+      label(`x̄ = ${val}`,meanX,cy-40,'#0891B2',(meanT-.3)/.7*.55,9.5);
+    }
+  }
+  if(medianT>0){
+    const medX=valToX(fullMedian,cx,span),mAlpha=medianT*.28;
+    vLine(medX,cy-20,cy+14,'#10B981',mAlpha,[3,3]);
+    if(medianT>.4)label(`median = ${fullMedian}`,medX,cy-28,'#10B981',(medianT-.4)/.6*.5,9.5);
+  }
+  if(outlierT>.8){
+    const a=(outlierT-.8)/.2*.35;
+    ctx.save();ctx.globalAlpha=a;ctx.fillStyle='#78716C';
+    ctx.font='11px Sora,sans-serif';ctx.textAlign='center';
+    ctx.fillText('One outlier pulls the mean — but the median holds.',cx,cy+46);
+    ctx.restore();
+  }
+}
+requestAnimationFrame(frame);
+
+/* ════════════════════════════════════════════════════════════
+   SIDEBAR
+════════════════════════════════════════════════════════════ */
+let slim=false;
+function toggleSidebar(){
+  slim=!slim;
+  document.getElementById('sidebar').classList.toggle('slim',slim);
+  document.getElementById('tog-icon').style.transform=slim?'scaleX(-1)':'';
+}
+
+function toggleCollapse(id){
+  const hdr=document.getElementById(id+'-hdr');
+  const body=document.getElementById(id+'-body');
+  const isOpen=body.classList.contains('open');
+  hdr.classList.toggle('open',!isOpen);
+  body.classList.toggle('open',!isOpen);
+}
+
+/* ════════════════════════════════════════════════════════════
+   10 BIG IDEAS
+════════════════════════════════════════════════════════════ */
+function openBigIdea(i){
+  const idea=BIG_IDEAS[i];
+  document.getElementById('bi-modal-title').textContent = '10 Big Ideas of Statistics';
+  document.getElementById('bi-modal-num').textContent = '#'+(i+1);
+  document.getElementById('bi-modal-name').textContent = idea.name;
+  document.getElementById('bi-modal-tagline').textContent = idea.tagline;
+  document.getElementById('bi-modal-body').textContent = idea.body;
+  const btn=document.getElementById('bi-modal-explore-btn');
+  btn.onclick=()=>{ closeBigIdea(); go(idea.prompt); };
+  document.getElementById('bi-modal-bg').classList.add('show');
+}
+function closeBigIdea(){ document.getElementById('bi-modal-bg').classList.remove('show'); }
+
+/* ════════════════════════════════════════════════════════════
+   myNOTEBOOK
+════════════════════════════════════════════════════════════ */
+let notebookEntries = [];
+
+function openNotebook(){
+  renderNotebook();
+  document.getElementById('nb-panel-bg').classList.add('show');
+}
+function closeNotebook(){ document.getElementById('nb-panel-bg').classList.remove('show'); }
+
+function saveToNotebook(topic, body){
+  notebookEntries.unshift({topic, body, time: new Date().toLocaleTimeString()});
+  // Update sidebar preview
+  const nbhdr = document.getElementById('nb-hdr');
+  if(notebookEntries.length > 0){
+    const badge = nbhdr.querySelector('.nb-badge');
+    if(!badge){
+      const span = document.createElement('span');
+      span.className = 'nb-badge';
+      span.style.cssText = 'margin-left:auto;font-family:DM Mono,monospace;font-size:9px;background:rgba(8,145,178,0.2);color:#7DD3FC;padding:2px 6px;border-radius:10px;';
+      span.textContent = notebookEntries.length;
+      nbhdr.insertBefore(span, nbhdr.querySelector('.s-chev'));
+    } else {
+      badge.textContent = notebookEntries.length;
+    }
+  }
+}
+
+function renderNotebook(){
+  const el = document.getElementById('nb-entries');
+  if(notebookEntries.length === 0){
+    el.innerHTML = '<div class="nb-empty-state">Nothing captured yet.<br>As you explore concepts, key insights will be saved here automatically.</div>';
+    return;
+  }
+  el.innerHTML = notebookEntries.map(e=>`
+    <div class="nb-entry">
+      <div class="nb-entry-topic">${e.topic} · ${e.time}</div>
+      <div class="nb-entry-body">${e.body}</div>
+    </div>
+  `).join('');
+}
+
+/* ════════════════════════════════════════════════════════════
+   FILE UPLOAD
+════════════════════════════════════════════════════════════ */
+let grounded=false,gFile='';
+function handleFile(inp){
+  if(!inp.files.length)return;
+  gFile=inp.files[0].name;grounded=true;
+  const el=document.getElementById('s-ground');
+  el.classList.add('on');
+  document.getElementById('s-gtxt').textContent=trunc(gFile,22);
+  document.getElementById('ta').placeholder='Grounded in '+trunc(gFile,26)+' — ask anything…';
+}
+function trunc(s,n){return s.length>n?s.slice(0,n)+'…':s;}
+
+/* ════════════════════════════════════════════════════════════
+   INPUT
+════════════════════════════════════════════════════════════ */
+function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,140)+'px';}
+function onKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();submit();}}
+function submit(){
+  const ta=document.getElementById('ta'),val=ta.value.trim();
+  if(!val||typing)return;
+  go(val);ta.value='';ta.style.height='auto';
+}
+
+/* ════════════════════════════════════════════════════════════
+   CONVERSATION
+════════════════════════════════════════════════════════════ */
+let inConv=false,typing=false,typingEl=null;
+
+function _go(text){
+  if(!inConv){
+    document.getElementById('welcome').classList.add('gone');
+    document.getElementById('conv').classList.add('on');
+    document.getElementById('chips').style.display='none';
+    inConv=true;
+  }
+  const w=document.getElementById('conv-wrap');
+  const u=document.createElement('div');
+  u.className='user-msg';
+  u.innerHTML=`<div class="user-bub">${esc(text)}</div>`;
+  w.appendChild(u);scrollBot();
+  typing=true;
+  typingEl=document.createElement('div');typingEl.className='typing';
+  typingEl.innerHTML=`<div class="ai-av">${logo()}</div><div class="tdots"><div class="tdot"></div><div class="tdot"></div><div class="tdot"></div></div>`;
+  w.appendChild(typingEl);scrollBot();
+  setTimeout(()=>{typing=false;typingEl.remove();typingEl=null;respond(text);scrollBot();},1200);
+}
+
+// Session gate
+let sessionsUsed=2;
+const SESSION_LIMIT=5;
+function go(text){
+  if(sessionsUsed>=SESSION_LIMIT){showProModal();return;}
+  sessionsUsed++;
+  updateFreeBar();
+  _go(text);
+}
+
+function respond(text){
+  const w=document.getElementById('conv-wrap');
+  const lower=text.toLowerCase();
+  const showChart=/graph|visual|histogram|distribution|boxplot|scatter/.test(lower);
+  const isQuiz=/quiz|practice|exam/.test(lower);
+  const isPValue=/p.value|hypothesis/.test(lower);
+  const isGrade = currentGrade;
+
+  const banner=grounded
+    ?`<div style="display:flex;align-items:center;gap:7px;padding:7px 13px;border-radius:8px;background:#ECFDF5;border:1px solid rgba(16,185,129,.17);margin-bottom:14px;font-size:12px;color:#065F46;"><div style="width:5px;height:5px;border-radius:50%;background:#10B981;flex-shrink:0"></div>Grounded in <strong style="margin-left:3px">${esc(gFile)}</strong></div>`:'';
+
+  const stageLabel = isGrade==='elementary'?'CCDC-M · Exploring Data' : isGrade==='middle'?'CCDC-M · Stage 1 — Context':'CCDC-M · Stage 1 — Context';
+  const pill=`<div class="stage-pill"><div class="spip"></div>${stageLabel}</div>`;
+
+  let body='',notebookTopic='',notebookBody='';
+
+  if(showChart){
+    body=`<p>Before any formula, let me show you something real.</p>
+      <p>A teacher recorded <strong>final exam scores</strong> for 120 students. Here is what they look like:</p>
+      ${chart()}
+      <div class="interp"><strong>StatSense asks →</strong> The mean is 74 and the median is 77. What does that gap tell you about the shape — before I explain anything?</div>
+      <div class="drills">
+        <button class="drill" onclick="go('Left-skewed — the mean is pulled down by low scores')">Left-skewed</button>
+        <button class="drill" onclick="go('Right-skewed — a tail pulling to the right')">Right-skewed</button>
+        <button class="drill" onclick="go('Walk me through the shape')">Walk me through it</button>
+      </div>`;
+    notebookTopic='Distribution Shape';
+    notebookBody='Mean (74) < Median (77) signals left skew — a few low scores pull the mean down while the median holds steady.';
+  } else if(isPValue){
+    body=`<p>A p-value only makes sense inside a story. So let us start with one.</p>
+      <p>A campus health team claims their sleep program improves GPA. They test it on 40 students. The average gain is 0.3 points. <strong>Real — or just luck?</strong></p>
+      <div class="interp"><strong>StatSense asks →</strong> Before I define anything — what would convince you this result was not due to chance? What would you need to see?</div>`;
+    notebookTopic='p-value Intuition';
+    notebookBody='A p-value answers: if the null hypothesis were true, how surprising would this result be? Small p-value = surprising result = evidence against null.';
+  } else if(isQuiz){
+    body=`<p>Drill mode. One question at a time — answer it, then we move forward.</p>
+      <p style="margin-top:12px;padding:12px 15px;background:var(--main-bg);border-radius:8px;border-left:2.5px solid var(--teal);font-weight:500;">
+        A dataset has a mean of 50 and a standard deviation of 8. Roughly what percentage of values fall between 42 and 58?
+      </p>
+      <div class="drills">
+        <button class="drill" onclick="go('About 68% — one standard deviation either side')">About 68%</button>
+        <button class="drill" onclick="go('About 95%')">About 95%</button>
+        <button class="drill" onclick="go('About 50%')">About 50%</button>
+        <button class="drill" onclick="go('I need a hint first')">Hint</button>
+      </div>`;
+    notebookTopic='Empirical Rule';
+    notebookBody='68–95–99.7 Rule: ~68% of data within 1 SD, ~95% within 2 SD, ~99.7% within 3 SD of the mean.';
+  } else {
+    // Grade-aware default response
+    const greetings = {
+      elementary: 'Great question! Let us look at this together.',
+      middle: 'Good question. Let us build from what you already know.',
+      high: 'Every investigation starts with a real situation — one that makes the statistics feel worth knowing before we see a single formula.',
+      college: 'Every investigation starts with a real situation — one that makes the statistics feel worth knowing before we see a single formula.',
+    };
+    body=`<p>${greetings[currentGrade]}</p>
+      <p>What are you trying to understand? A concept that did not click, a graph you cannot quite read, a dataset you want to explore, or a topic you need to lock in?</p>
+      <div class="interp"><strong>StatSense asks →</strong> Describe it in plain language first. The statistics will follow naturally once the question is clear.</div>`;
+    notebookTopic='Session Note';
+    notebookBody=`Explored: "${text.slice(0,80)}${text.length>80?'…':''}"`;
+  }
+
+  const d=document.createElement('div');
+  d.innerHTML=`${banner}${pill}<div class="ai-msg"><div class="ai-av">${logo()}</div><div class="ai-bub">${body}</div></div>`;
+  w.appendChild(d);
+
+  // Auto-save to notebook
+  if(notebookTopic) saveToNotebook(notebookTopic, notebookBody);
+}
+
+function chart(){
+  return `<div class="chart-card">
+    <div class="chart-meta">Exam Score Distribution · n = 120 students</div>
+    <svg style="display:block;width:100%;overflow:visible" viewBox="0 0 440 140">
+      <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0891B2" stop-opacity=".7"/><stop offset="100%" stop-color="#0E7490" stop-opacity=".4"/></linearGradient></defs>
+      <line x1="28" y1="4" x2="28" y2="116" stroke="#E9E5DF" stroke-width="1"/>
+      <line x1="28" y1="116" x2="432" y2="116" stroke="#E9E5DF" stroke-width="1"/>
+      <line x1="28" y1="78" x2="432" y2="78" stroke="#E9E5DF" stroke-width=".5" stroke-dasharray="4,4"/>
+      <line x1="28" y1="40" x2="432" y2="40" stroke="#E9E5DF" stroke-width=".5" stroke-dasharray="4,4"/>
+      <rect class="c-bar" x="34" y="108" width="44" height="8" rx="2.5" fill="url(#bg)"/>
+      <rect class="c-bar" x="84" y="96" width="44" height="20" rx="2.5" fill="url(#bg)"/>
+      <rect class="c-bar" x="134" y="72" width="44" height="44" rx="2.5" fill="url(#bg)"/>
+      <rect class="c-bar" x="184" y="40" width="44" height="76" rx="2.5" fill="url(#bg)"/>
+      <rect class="c-bar" x="234" y="12" width="44" height="104" rx="2.5" fill="url(#bg)"/>
+      <rect class="c-bar" x="284" y="46" width="44" height="70" rx="2.5" fill="url(#bg)"/>
+      <rect class="c-bar" x="334" y="84" width="44" height="32" rx="2.5" fill="url(#bg)"/>
+      <path d="M34,114 C52,114 66,110 80,104 C94,98 108,84 124,70 C140,56 152,32 170,20 C184,10 200,5 216,4 C232,5 248,12 264,26 C280,40 294,66 310,84 C326,100 340,110 358,113 C374,116 396,116 432,116" fill="none" stroke="#D97706" stroke-width="1.6" stroke-linecap="round" opacity=".6"/>
+      <line x1="258" y1="8" x2="258" y2="116" stroke="#D97706" stroke-width="1" stroke-dasharray="5,3" opacity=".45"/>
+      <text x="263" y="18" font-family="DM Mono,monospace" font-size="9" fill="#D97706" opacity=".7">x̄=74</text>
+      <text x="56" y="130" font-family="DM Mono,monospace" font-size="8.5" fill="#B5AFA8" text-anchor="middle">50–59</text>
+      <text x="106" y="130" font-family="DM Mono,monospace" font-size="8.5" fill="#B5AFA8" text-anchor="middle">60–69</text>
+      <text x="156" y="130" font-family="DM Mono,monospace" font-size="8.5" fill="#B5AFA8" text-anchor="middle">70–74</text>
+      <text x="206" y="130" font-family="DM Mono,monospace" font-size="8.5" fill="#B5AFA8" text-anchor="middle">75–79</text>
+      <text x="256" y="130" font-family="DM Mono,monospace" font-size="8.5" fill="#0891B2" text-anchor="middle" font-weight="500">80–84</text>
+      <text x="306" y="130" font-family="DM Mono,monospace" font-size="8.5" fill="#B5AFA8" text-anchor="middle">85–89</text>
+      <text x="356" y="130" font-family="DM Mono,monospace" font-size="8.5" fill="#B5AFA8" text-anchor="middle">90–99</text>
+    </svg>
+    <div style="display:flex;gap:16px;margin-top:9px;padding-top:8px;border-top:1px solid var(--border)">
+      <div style="display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:9.5px;color:var(--text-3)"><div style="width:11px;height:9px;border-radius:2px;background:#0891B2;opacity:.6"></div>Frequency</div>
+      <div style="display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:9.5px;color:var(--text-3)"><div style="width:14px;height:1.5px;background:#D97706;opacity:.6;border-radius:1px"></div>Normal curve</div>
+      <div style="margin-left:auto;font-family:var(--mono);font-size:9.5px;color:var(--text-3)">Median = 77</div>
+    </div>
+  </div>`;
+}
+
+function logo(){
+  return `<svg width="14" height="14" viewBox="0 0 18 18" fill="none"><rect x="1" y="11" width="3" height="6" rx="1" fill="white" opacity=".7"/><rect x="5.5" y="7" width="3" height="10" rx="1" fill="white" opacity=".85"/><rect x="10" y="3" width="3" height="14" rx="1" fill="white"/><rect x="14.5" y="8" width="3" height="9" rx="1" fill="white" opacity=".65"/></svg>`;
+}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function scrollBot(){const c=document.getElementById('conv');c.scrollTop=c.scrollHeight;}
+
+function resetWelcome(){
+  document.getElementById('welcome').classList.remove('gone');
+  document.getElementById('conv').classList.remove('on');
+  document.getElementById('conv-wrap').innerHTML='';
+  document.getElementById('chips').style.display='';
+  document.getElementById('ta').value='';
+  document.getElementById('ta').style.height='auto';
+  applyGradeConfig(currentGrade);
+  inConv=false;
+}
+
+/* ════════════════════════════════════════════════════════════
+   AUTH
+════════════════════════════════════════════════════════════ */
+let currentLevel='student';
+
+function selectLevel(l){
+  currentLevel=l;
+  document.getElementById('level-student').classList.toggle('selected',l==='student');
+  document.getElementById('level-teacher').classList.toggle('selected',l==='teacher');
+  // Default grade based on role
+  if(l==='teacher') setGrade('college');
+}
+
+function selectPlan(p){
+  // Pro is disabled — only free is selectable
+  if(p==='pro'){ showProModal(); return; }
+  document.getElementById('plan-free').classList.add('selected');
+  document.getElementById('plan-pro').classList.remove('selected');
+}
+
+function showLogin(){
+  document.getElementById('auth-signup-view').style.display='none';
+  document.getElementById('auth-login-view').style.display='';
+}
+function showSignup(){
+  document.getElementById('auth-login-view').style.display='none';
+  document.getElementById('auth-signup-view').style.display='';
+}
+function signInWithGoogle(){ signUp(); }
+
+function signUp(){
+  const emailEl=document.getElementById('auth-email');
+  const email=emailEl?emailEl.value.trim():'';
+  if(!email){ emailEl.style.borderColor='#F43F5E'; emailEl.focus(); return; }
+  _enterApp(email);
+}
+function signIn(){
+  const emailEl=document.getElementById('login-email');
+  const email=emailEl?emailEl.value.trim():'';
+  if(!email){ emailEl.style.borderColor='#F43F5E'; emailEl.focus(); return; }
+  _enterApp(email);
+}
+
+function _enterApp(email){
+  // Derive display name
+  const raw=email?email.split('@')[0]:'Student';
+  const displayName=raw.charAt(0).toUpperCase()+raw.slice(1).replace(/[._-]/g,' ');
+  document.getElementById('s-av').textContent=displayName[0].toUpperCase();
+  document.getElementById('s-uname').textContent=displayName;
+
+  // Set grade default based on level
+  if(currentLevel==='teacher') setGrade('college');
+  else setGrade('high');
+
+  // Build initial chips
+  buildChips(currentGrade);
+
+  // Dismiss auth
+  const auth=document.getElementById('auth-screen');
+  auth.classList.add('hidden');
+  setTimeout(()=>auth.style.display='none',520);
+
+  // Update bar
+  updateFreeBar();
+}
+
+function updateFreeBar(){
+  const pct=(sessionsUsed/SESSION_LIMIT)*100;
+  document.getElementById('plan-bar-fill').style.width=pct+'%';
+  document.getElementById('plan-badge-count').textContent=sessionsUsed+' / '+SESSION_LIMIT+' sessions';
+  if(pct>=80) document.getElementById('plan-bar-fill').style.background='#F59E0B';
+}
+
+function showProModal(){ document.getElementById('pro-modal').classList.add('show'); }
+function closeProModal(){ document.getElementById('pro-modal').classList.remove('show'); }
+
+// Initialize chips on load
+buildChips('high');
+
+</script>
+</body>
+</html>
