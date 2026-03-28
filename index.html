@@ -403,6 +403,8 @@ canvas#anim {
   position: relative; z-index: 1;
 }
 .welcome.gone { display: none; }
+.welcome.gone ~ canvas#anim { display: none; }
+#main-area:has(.welcome.gone) canvas#anim { display: none; }
 .w-logo {
   width: 40px; height: 40px; border-radius: 11px;
   background: linear-gradient(140deg, #0EA5E9, #0369A1);
@@ -743,7 +745,7 @@ canvas#anim {
       </div>
       <div class="auth-field" style="margin-bottom:20px">
         <label class="auth-label">Email</label>
-        <input class="auth-input" id="auth-email" type="email" placeholder="your@email.com" autocomplete="email"/>
+        <input class="auth-input" id="auth-email" type="text" placeholder="your@email.com" autocomplete="email" onkeydown="if(event.key==='Enter')signUp()"/>
       </div>
       <button class="auth-btn" onclick="signUp()">Enter free</button>
       <div class="auth-switch">Already have an account? <span onclick="showLogin()">Sign in</span></div>
@@ -765,7 +767,7 @@ canvas#anim {
       </div>
       <div class="auth-field">
         <label class="auth-label">Email</label>
-        <input class="auth-input" id="login-email" type="email" placeholder="your@email.com" autocomplete="email"/>
+        <input class="auth-input" id="login-email" type="text" placeholder="your@email.com" autocomplete="email"/>
       </div>
 
       <button class="auth-btn" onclick="signIn()">Sign In</button>
@@ -1361,10 +1363,13 @@ function submit(){
    CONVERSATION
 ════════════════════════════════════════════════════════════ */
 let inConv=false,typing=false,typingEl=null;
+let conversationHistory=[];
 
 function _go(text){
   if(!inConv){
     document.getElementById('welcome').classList.add('gone');
+    const cv=document.getElementById('anim');
+    if(cv) cv.style.display='none';
     document.getElementById('conv').classList.add('on');
     document.getElementById('chips').style.display='none';
     inConv=true;
@@ -1378,7 +1383,68 @@ function _go(text){
   typingEl=document.createElement('div');typingEl.className='typing';
   typingEl.innerHTML=`<div class="ai-av">${logo()}</div><div class="tdots"><div class="tdot"></div><div class="tdot"></div><div class="tdot"></div></div>`;
   w.appendChild(typingEl);scrollBot();
-  setTimeout(()=>{typing=false;typingEl.remove();typingEl=null;respond(text);scrollBot();},1200);
+  conversationHistory.push({role:'user',content:text});
+  callClaudeAPI(text);
+}
+
+async function callClaudeAPI(text){
+  try{
+    const res=await fetch('/api/chat',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        messages:conversationHistory,
+        userSport:userSport||'',
+        userTopic:userTopic||'',
+        userStruggle:userStruggle||'',
+        userCoach:userCoach||''
+      })
+    });
+    if(typingEl){typingEl.remove();typingEl=null;}
+    typing=false;
+
+    const pill=`<div class="stage-pill"><div class="spip"></div>CCDC-M Coaching</div>`;
+    const d=document.createElement('div');
+    d.innerHTML=`${pill}<div class="ai-msg"><div class="ai-av">${logo()}</div><div class="ai-bub" id="streaming-bub"></div></div>`;
+    document.getElementById('conv-wrap').appendChild(d);
+    scrollBot();
+
+    const bub=document.getElementById('streaming-bub');
+    const reader=res.body.getReader();
+    const decoder=new TextDecoder();
+    let fullText='';
+
+    while(true){
+      const{done,value}=await reader.read();
+      if(done)break;
+      const chunk=decoder.decode(value);
+      const lines=chunk.split('\n');
+      for(const line of lines){
+        if(line.startsWith('data: ')){
+          try{
+            const parsed=JSON.parse(line.slice(6));
+            if(parsed.text){
+              fullText+=parsed.text;
+              bub.innerHTML=mdToHtml(fullText);
+              scrollBot();
+            }
+            if(parsed.done){
+              bub.removeAttribute('id');
+              conversationHistory.push({role:'assistant',content:fullText});
+              saveToNotebook('Session note',fullText.slice(0,120)+(fullText.length>120?'...':''));
+            }
+          }catch(e){}
+        }
+      }
+    }
+  }catch(err){
+    if(typingEl){typingEl.remove();typingEl=null;}
+    typing=false;
+    const w=document.getElementById('conv-wrap');
+    const d=document.createElement('div');
+    d.innerHTML=`<div class="ai-msg"><div class="ai-av">${logo()}</div><div class="ai-bub">Connection error. Make sure the server is running on localhost:3000.</div></div>`;
+    w.appendChild(d);scrollBot();
+  }
 }
 
 // Session gate
@@ -1496,7 +1562,23 @@ function chart(){
   </div>`;
 }
 
-function logo(){
+function mdToHtml(text){
+  return text
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em>$1</em>')
+    .replace(/^#{3}\s+(.+)$/gm,'<h3 style="font-size:13px;font-weight:600;color:#0E7490;margin:14px 0 6px">$1</h3>')
+    .replace(/^#{2}\s+(.+)$/gm,'<h2 style="font-size:14px;font-weight:600;color:#0E1C2A;margin:16px 0 8px;padding-bottom:4px;border-bottom:1px solid #E9E5DF">$1</h2>')
+    .replace(/^#{1}\s+(.+)$/gm,'<h2 style="font-size:15px;font-weight:600;color:#0E1C2A;margin:16px 0 8px">$1</h2>')
+    .replace(/^---+$/gm,'<hr style="border:none;border-top:1px solid #E9E5DF;margin:14px 0">')
+    .replace(/^[-*]\s+(.+)$/gm,'<li style="margin:4px 0 4px 16px">$1</li>')
+    .replace(/(<li.*<\/li>\n?)+/g,'<ul style="margin:8px 0;padding:0">$&</ul>')
+    .replace(/`([^`]+)`/g,'<code style="font-family:\'DM Mono\',monospace;font-size:12px;background:#F1F0ED;padding:1px 5px;border-radius:4px;color:#0E7490">$1</code>')
+    .replace(/\n\n/g,'</p><p style="margin:0 0 10px">')
+    .replace(/\n/g,'<br>')
+    .replace(/^(.)/,'<p style="margin:0 0 10px">$1')
+    .replace(/(.)$/,'$1</p>');
+}
   return `<svg width="14" height="14" viewBox="0 0 18 18" fill="none"><rect x="1" y="11" width="3" height="6" rx="1" fill="white" opacity=".7"/><rect x="5.5" y="7" width="3" height="10" rx="1" fill="white" opacity=".85"/><rect x="10" y="3" width="3" height="14" rx="1" fill="white"/><rect x="14.5" y="8" width="3" height="9" rx="1" fill="white" opacity=".65"/></svg>`;
 }
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
