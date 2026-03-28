@@ -4,6 +4,15 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>StatSense AI</title>
+<!-- Microsoft Clarity — behavioral analytics -->
+<script type="text/javascript">
+  (function(c,l,a,r,i,t,y){
+    c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+    t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+    y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+  })(window,document,"clarity","script","CLARITY_PROJECT_ID");
+  // Replace CLARITY_PROJECT_ID with your actual ID from clarity.microsoft.com
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
 <style>
 
@@ -652,6 +661,54 @@ canvas#anim {
 .pro-modal-close-btn { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 9px; background: transparent; font-family: var(--font); font-size: 13.5px; color: var(--text-2); cursor: pointer; }
 .pro-modal-close-btn:hover { background: #F0EDE8; }
 
+
+/* ══ CUSTOM INFO MODAL ══════════════════════════════════════ */
+.custom-modal-bg {
+  display: none; position: fixed; inset: 0; z-index: 80;
+  background: rgba(14,28,42,0.6); align-items: center; justify-content: center;
+  backdrop-filter: blur(4px);
+}
+.custom-modal-bg.show { display: flex; }
+.custom-modal {
+  background: var(--card); border-radius: 16px;
+  padding: 28px; width: 100%; max-width: 480px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  animation: authIn 0.3s ease both;
+}
+.custom-modal-title { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+.custom-modal-sub { font-size: 13px; color: var(--text-2); line-height: 1.6; margin-bottom: 18px; }
+.custom-field { margin-bottom: 14px; }
+.custom-label { display: block; font-size: 12px; font-weight: 500; color: #57534E; margin-bottom: 5px; }
+.custom-input {
+  width: 100%; padding: 10px 13px; border: 1.5px solid var(--border); border-radius: 9px;
+  background: var(--main-bg); font-family: var(--font); font-size: 13.5px; color: var(--text);
+  outline: none; transition: border-color 0.2s;
+}
+.custom-input:focus { border-color: rgba(8,145,178,0.4); box-shadow: 0 0 0 3px rgba(8,145,178,0.09); }
+.custom-ta {
+  width: 100%; padding: 10px 13px; border: 1.5px solid var(--border); border-radius: 9px;
+  background: var(--main-bg); font-family: var(--font); font-size: 13.5px; color: var(--text);
+  outline: none; resize: none; height: 100px; line-height: 1.55;
+  transition: border-color 0.2s;
+}
+.custom-ta:focus { border-color: rgba(8,145,178,0.4); box-shadow: 0 0 0 3px rgba(8,145,178,0.09); }
+.custom-ta::placeholder, .custom-input::placeholder { color: var(--text-3); }
+.custom-save {
+  width: 100%; padding: 11px; background: var(--teal-d); border: none; border-radius: 9px;
+  font-family: var(--font); font-size: 14px; font-weight: 600; color: #fff;
+  cursor: pointer; transition: all 0.15s; margin-bottom: 9px;
+}
+.custom-save:hover { background: var(--teal); }
+.custom-cancel {
+  width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 9px;
+  background: transparent; font-family: var(--font); font-size: 13px;
+  color: var(--text-2); cursor: pointer;
+}
+.custom-cancel:hover { background: var(--main-bg); }
+.custom-active-dot {
+  width: 6px; height: 6px; border-radius: 50%; background: #10B981;
+  display: inline-block; margin-left: 5px; vertical-align: middle;
+}
 </style>
 </head>
 <body>
@@ -674,7 +731,7 @@ canvas#anim {
     <!-- Sign Up View -->
     <div id="auth-signup-view">
       <div class="auth-title">Start learning stats.</div>
-      <div class="auth-sub">Your AI statistics coach — powered by the CCDC-M Framework.</div>
+      <div class="auth-sub">Your AI statistics coach, powered by the CCDC-M Framework.</div>
       <button class="auth-google" onclick="signInWithGoogle()">
         <svg width="16" height="16" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
         Continue with Google
@@ -688,7 +745,7 @@ canvas#anim {
         <label class="auth-label">Email</label>
         <input class="auth-input" id="auth-email" type="email" placeholder="your@email.com" autocomplete="email"/>
       </div>
-      <button class="auth-btn" onclick="signUp()">Enter — it's free</button>
+      <button class="auth-btn" onclick="signUp()">Enter free</button>
       <div class="auth-switch">Already have an account? <span onclick="showLogin()">Sign in</span></div>
       <div class="auth-terms">By continuing you agree to our Terms of Service and Privacy Policy.</div>
     </div>
@@ -729,7 +786,7 @@ canvas#anim {
       <div class="bi-num-lg" id="bi-modal-num">#1</div>
       <div>
         <div class="bi-modal-name" id="bi-modal-name">Variability</div>
-        <div class="bi-modal-tagline" id="bi-modal-tagline">Data varies — and that is why statistics exists.</div>
+        <div class="bi-modal-tagline" id="bi-modal-tagline">Data varies, and that is why statistics exists.</div>
       </div>
     </div>
     <div class="bi-modal-body" id="bi-modal-body"></div>
@@ -745,7 +802,7 @@ canvas#anim {
       <div class="nb-panel-title">📓 myNotebook</div>
       <button class="bi-x" onclick="closeNotebook()">✕</button>
     </div>
-    <div class="nb-panel-sub">Key ideas captured from your StatSense AI sessions — organized for review.</div>
+    <div class="nb-panel-sub">Key ideas captured from your StatSense AI sessions, organized for review.</div>
     <div id="nb-entries">
       <div class="nb-empty-state">
         Nothing captured yet.<br>
@@ -761,9 +818,9 @@ canvas#anim {
   <div class="pro-modal">
     <div class="pro-modal-emoji">🚀</div>
     <div class="pro-modal-title">Pro is coming soon</div>
-    <div class="pro-modal-sub">We are in feedback mode — gathering insights from real students before we launch Pro. Right now, everything is Free.</div>
+    <div class="pro-modal-sub">We are in feedback mode, gathering insights from real students before we launch Pro. Right now, everything is free.</div>
     <div class="pro-modal-soon">Expected launch: after beta feedback round</div>
-    <button class="pro-modal-close-btn" onclick="closeProModal()">Got it — keep learning free</button>
+    <button class="pro-modal-close-btn" onclick="closeProModal()">Got it, keep learning</button>
   </div>
 </div>
 
@@ -791,14 +848,6 @@ canvas#anim {
     <span class="s-new-icon">✦</span>
     <span class="s-new-lbl">New session</span>
   </button>
-
-  <!-- Grade Level -->
-  <div class="grade-selector" id="grade-selector">
-    <button class="grade-btn" id="grade-elem" onclick="setGrade('elementary')">Elem</button>
-    <button class="grade-btn" id="grade-mid" onclick="setGrade('middle')">Middle</button>
-    <button class="grade-btn active" id="grade-high" onclick="setGrade('high')">High</button>
-    <button class="grade-btn" id="grade-college" onclick="setGrade('college')">College</button>
-  </div>
 
   <!-- Course Material -->
   <div class="s-ground" id="s-ground">
@@ -866,6 +915,18 @@ canvas#anim {
     <div class="s-rec"><div class="s-rdot" style="background:#8B5CF6"></div><div class="s-rname">Normal Distribution</div></div>
   </div>
 
+  <!-- Custom info button -->
+  <button class="s-item" id="custom-info-btn" onclick="openCustomInfo()" style="margin:4px 8px 0;width:calc(100% - 16px);background:rgba(8,145,178,0.06);border:1px solid rgba(8,145,178,0.15);border-radius:8px;color:#0E7490;">
+    <span class="s-icon">✦</span>
+    <span class="s-ilbl" id="custom-btn-label" style="font-weight:500;">Personalize</span>
+  </button>
+
+  <!-- Feedback button -->
+  <button class="s-item" onclick="openFeedback()" style="margin:4px 8px 0;width:calc(100% - 16px);background:rgba(8,145,178,0.06);border:1px solid rgba(8,145,178,0.15);border-radius:8px;color:#0E7490;">
+    <span class="s-icon">💬</span>
+    <span class="s-ilbl" style="font-weight:500;">Give Feedback</span>
+  </button>
+
   <div class="s-footer">
     <div class="s-plan-badge">
       <div class="plan-badge-top">
@@ -915,7 +976,8 @@ canvas#anim {
             placeholder="Ask about any graph, concept, dataset, or stats problem…"
             oninput="autoResize(this)" onkeydown="onKey(event)"></textarea>
           <div class="input-acts">
-            <button class="btn-attach" onclick="document.getElementById('file-input').click()" title="Upload course material">📎</button>
+            <button class="btn-attach" onclick="document.getElementById('file-input').click()" title="Upload course material or dataset"
+              style="font-size:20px;font-weight:300;color:#0891B2;border-color:rgba(8,145,178,0.25);">+</button>
             <button class="btn-send" onclick="submit()">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
                 <path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"
@@ -940,63 +1002,63 @@ canvas#anim {
 const BIG_IDEAS = [
   {
     name: 'Variability',
-    tagline: 'Data varies — and that is why statistics exists.',
-    body: 'If every student scored exactly 75 on every test, we would not need statistics. But they do not. Heights vary. Opinions vary. Outcomes vary. Statistics is the science of understanding, measuring, and making sense of that variation. Variability is not noise — it is the signal.',
-    prompt: 'Teach me about Variability using the CCDC-M framework — start with a real-world context before any formula.'
+    tagline: 'Data varies, and that is why statistics exists.',
+    body: 'If every student scored exactly 75 on every test, we would not need statistics. But they do not. Heights vary. Opinions vary. Outcomes vary. Statistics is the science of understanding, measuring, and making sense of that variation. Variability is not noise. It is the signal.',
+    prompt: 'Teach me about Variability using the CCDC-M framework. Start with a real-world context before any formula.'
   },
   {
     name: 'Distribution',
     tagline: 'How data spreads out tells a story.',
-    body: 'When we collect data, it takes a shape. Some values are common, others rare. That shape — the distribution — reveals patterns: Is it symmetric? Skewed? Are there outliers? Learning to see distributions is like learning to read. Once you can, you see stories in every dataset.',
-    prompt: 'Help me understand distributions — what do different shapes tell us about the data?'
+    body: 'When we collect data, it takes a shape. Some values are common, others rare. That shape, the distribution, reveals patterns: Is it symmetric? Skewed? Are there outliers? Learning to see distributions is like learning to read. Once you can, you see stories in every dataset.',
+    prompt: 'Help me understand distributions. What do different shapes tell us about the data?'
   },
   {
     name: 'Central Tendency',
     tagline: 'Where is the "typical" value?',
-    body: 'We often want to summarize data with a single typical number. Mean, median, and mode each tell a different story about where the center lies. Knowing which measure to use — and when — is a crucial skill. The animated dot plot on this welcome screen shows you exactly why it matters.',
-    prompt: 'Explain mean, median, and mode — and show me a visual that captures when each one misleads.'
+    body: 'We often want to summarize data with a single typical number. Mean, median, and mode each tell a different story about where the center lies. Knowing which measure to use, and when, is a crucial skill. The animated dot plot on this welcome screen shows you exactly why it matters.',
+    prompt: 'Explain mean, median, and mode. Show me a visual that captures when each one misleads.'
   },
   {
     name: 'Spread',
     tagline: 'How far from the center?',
-    body: 'Two groups can have the same average but look completely different. How tightly clustered or widely spread the data is tells us about consistency and reliability. Range, IQR, and standard deviation each measure this spread — and each tells a different part of the story.',
-    prompt: 'Teach me about spread — range, IQR, and standard deviation — with a real example.'
+    body: 'Two groups can have the same average but look completely different. How tightly clustered or widely spread the data is tells us about consistency and reliability. Range, IQR, and standard deviation each measure this spread, and each tells a different part of the story.',
+    prompt: 'Teach me about spread: range, IQR, and standard deviation. Give me a real example.'
   },
   {
     name: 'Sampling',
     tagline: 'The part can tell us about the whole.',
-    body: 'We rarely measure entire populations. Instead, we study samples — small, carefully chosen slices. A chef tastes a spoonful of soup to judge the whole pot. But if the soup is not stirred, that spoonful might mislead. How we sample determines how much we can trust our conclusions.',
-    prompt: 'Walk me through sampling — what makes a good sample and what can go wrong?'
+    body: 'We rarely measure entire populations. Instead, we study samples: small, carefully chosen slices. A chef tastes a spoonful of soup to judge the whole pot. But if the soup is not stirred, that spoonful might mislead. How we sample determines how much we can trust our conclusions.',
+    prompt: 'Walk me through sampling. What makes a good sample and what can go wrong?'
   },
   {
     name: 'Randomness',
     tagline: 'Chaos has structure.',
-    body: 'A single coin flip is unpredictable. But flip 1,000 coins, and you will get close to 500 heads. Random processes, repeated many times, produce predictable patterns. This is the foundation of statistical inference: order emerges from randomness. That is not magic — it is mathematics.',
-    prompt: 'Show me how randomness leads to predictable patterns — use a simulation or example.'
+    body: 'A single coin flip is unpredictable. But flip 1,000 coins, and you will get close to 500 heads. Random processes, repeated many times, produce predictable patterns. This is the foundation of statistical inference: order emerges from randomness. That is not magic. It is mathematics.',
+    prompt: 'Show me how randomness leads to predictable patterns. Use a simulation or example.'
   },
   {
     name: 'Probability',
     tagline: 'The language of uncertainty.',
-    body: 'There is a 70% chance of rain — probability gives us a way to talk precisely about uncertain events. It is the mathematical language for risk, chance, and confidence. Understanding probability means understanding how much to trust — or doubt — any statistical claim.',
+    body: 'There is a 70% chance of rain. Probability gives us a way to talk precisely about uncertain events. It is the mathematical language for risk, chance, and confidence. Understanding probability means understanding how much to trust, or doubt, any statistical claim.',
     prompt: 'Introduce me to probability with a real-world scenario I can reason through.'
   },
   {
     name: 'Inference',
     tagline: 'From sample to population.',
-    body: 'The ultimate goal: using what we observe in a sample to draw conclusions about a larger population. Confidence intervals and hypothesis tests are tools for saying: based on this sample, here is what I believe about the whole — with this level of certainty. Inference is where statistics earns its power.',
-    prompt: 'Explain statistical inference — what are confidence intervals and hypothesis tests trying to do?'
+    body: 'The ultimate goal: using what we observe in a sample to draw conclusions about a larger population. Confidence intervals and hypothesis tests are tools for saying: based on this sample, here is what I believe about the whole, with this level of certainty. Inference is where statistics earns its power.',
+    prompt: 'Explain statistical inference. What are confidence intervals and hypothesis tests trying to do?'
   },
   {
     name: 'Association vs. Causation',
     tagline: 'Correlation ≠ causation.',
-    body: 'Ice cream sales and drowning deaths both rise in summer. Does ice cream cause drowning? Obviously not — a third variable, hot weather, drives both. Statistics can reveal relationships, but proving causation requires more than correlation. Watch out for hidden third variables — they are everywhere.',
+    body: 'Ice cream sales and drowning deaths both rise in summer. Does ice cream cause drowning? Obviously not. A third variable, hot weather, drives both. Statistics can reveal relationships, but proving causation requires more than correlation. Watch out for hidden third variables. They are everywhere.',
     prompt: 'Teach me the difference between association and causation with a surprising real example.'
   },
   {
     name: 'Models & Assumptions',
     tagline: 'We simplify reality to understand it.',
     body: 'Every statistical method rests on assumptions: the data is random, the distribution is normal, observations are independent. When assumptions hold, the tools work beautifully. When they do not, results can mislead. A good statistician always asks: what am I assuming, and is that reasonable?',
-    prompt: 'Help me understand statistical models and assumptions — what can go wrong when we ignore them?'
+    prompt: 'Help me understand statistical models and assumptions. What can go wrong when we ignore them?'
   }
 ];
 
@@ -1017,23 +1079,23 @@ const GRADE_CONFIG = {
   },
   middle: {
     welcome: 'Data tells stories. Let\'s read them.',
-    sub: 'Ask about graphs, averages, probability, or any data concept.<br>Start with a question — StatSense coaches you step by step.',
+    sub: 'Ask about graphs, averages, probability, or any data concept.<br>Start with a question. StatSense coaches you step by step.',
     placeholder: 'Ask about mean, median, graphs, probability, or anything data…',
     chips: [
-      ['Mean vs. Median', 'Explain mean and median — when do they tell different stories?'],
-      ['Read a box plot', 'Help me read a box plot — what is each part telling me?'],
+      ['Mean vs. Median', 'Explain mean and median. When do they tell different stories?'],
+      ['Read a box plot', 'Help me read a box plot. What is each part telling me?'],
       ['Probability basics', 'Introduce me to probability with a real-world example.'],
-      ['What is correlation?', 'Explain correlation — does it mean one thing causes another?'],
+      ['What is correlation?', 'Explain correlation. Does it mean one thing causes another?'],
     ]
   },
   high: {
     welcome: 'Data is everywhere. Few people can truly read it.',
-    sub: 'Ask a question, explore a graph, or pick a concept below.<br>StatSense AI coaches — it never just gives answers.',
+    sub: 'Ask a question, explore a graph, or pick a concept below.<br>StatSense AI coaches. It never just gives answers.',
     placeholder: 'Ask about any graph, concept, dataset, or stats problem…',
     chips: [
-      ['Start with a graph', 'Start with a graph — show me a visual and walk me through it.'],
-      ['Teach me a concept', 'Teach me a concept using the CCDC-M framework — context first.'],
-      ['Quiz me', 'Quiz me — one question at a time with coaching feedback.'],
+      ['Start with a graph', 'Start with a graph. Show me a visual and walk me through it.'],
+      ['Teach me a concept', 'Teach me a concept using the CCDC-M framework. Context first.'],
+      ['Quiz me', 'Quiz me. One question at a time with coaching feedback.'],
       ['Explore a dataset', 'Help me explore and interpret a dataset.'],
     ]
   },
@@ -1042,10 +1104,10 @@ const GRADE_CONFIG = {
     sub: 'Upload your syllabus or notes, then ask anything.<br>CCDC-M framework: Context → Concept → Drills → Challenge → Mastery.',
     placeholder: 'Ask about inference, regression, distributions, hypothesis testing…',
     chips: [
-      ['p-value intuition', 'Build my intuition for p-values — context first, formula after.'],
+      ['p-value intuition', 'Build my intuition for p-values. Context first, formula after.'],
       ['Regression deep dive', 'Walk me through simple linear regression using real data.'],
       ['Hypothesis test setup', 'Help me set up a hypothesis test from scratch.'],
-      ['Confidence intervals', 'Explain confidence intervals — what does 95% really mean?'],
+      ['Confidence intervals', 'Explain confidence intervals. What does 95% really mean?'],
     ]
   }
 };
@@ -1054,13 +1116,10 @@ let currentGrade = 'high';
 
 function setGrade(g) {
   currentGrade = g;
-  ['elementary','middle','high','college'].forEach(k => {
-    document.getElementById('grade-'+k.slice(0,k==='college'?7:k==='elementary'?4:k==='middle'?3:4))
-    ?.classList.remove('active');
+  ['high','college'].forEach(k => {
+    document.getElementById('grade-'+k)?.classList.remove('active');
   });
-  // simplified id mapping
-  const idMap = {elementary:'elem',middle:'mid',high:'high',college:'college'};
-  document.getElementById('grade-'+idMap[g])?.classList.add('active');
+  document.getElementById('grade-'+g)?.classList.add('active');
   applyGradeConfig(g);
 }
 
@@ -1190,7 +1249,7 @@ function frame(ts){
     const a=(outlierT-.8)/.2*.35;
     ctx.save();ctx.globalAlpha=a;ctx.fillStyle='#78716C';
     ctx.font='11px Sora,sans-serif';ctx.textAlign='center';
-    ctx.fillText('One outlier pulls the mean — but the median holds.',cx,cy+46);
+    ctx.fillText('One outlier pulls the mean. The median holds.',cx,cy+46);
     ctx.restore();
   }
 }
@@ -1343,7 +1402,7 @@ function respond(text){
   const banner=grounded
     ?`<div style="display:flex;align-items:center;gap:7px;padding:7px 13px;border-radius:8px;background:#ECFDF5;border:1px solid rgba(16,185,129,.17);margin-bottom:14px;font-size:12px;color:#065F46;"><div style="width:5px;height:5px;border-radius:50%;background:#10B981;flex-shrink:0"></div>Grounded in <strong style="margin-left:3px">${esc(gFile)}</strong></div>`:'';
 
-  const stageLabel = isGrade==='elementary'?'CCDC-M · Exploring Data' : isGrade==='middle'?'CCDC-M · Stage 1 — Context':'CCDC-M · Stage 1 — Context';
+  const stageLabel = isGrade==='elementary'?'CCDC-M · Exploring Data' : isGrade==='middle'?'CCDC-M · Stage 1: Context':'CCDC-M · Stage 1: Context';
   const pill=`<div class="stage-pill"><div class="spip"></div>${stageLabel}</div>`;
 
   let body='',notebookTopic='',notebookBody='';
@@ -1352,27 +1411,27 @@ function respond(text){
     body=`<p>Before any formula, let me show you something real.</p>
       <p>A teacher recorded <strong>final exam scores</strong> for 120 students. Here is what they look like:</p>
       ${chart()}
-      <div class="interp"><strong>StatSense asks →</strong> The mean is 74 and the median is 77. What does that gap tell you about the shape — before I explain anything?</div>
+      <div class="interp"><strong>StatSense asks →</strong> The mean is 74 and the median is 77. What does that gap tell you about the shape, before I explain anything?</div>
       <div class="drills">
-        <button class="drill" onclick="go('Left-skewed — the mean is pulled down by low scores')">Left-skewed</button>
-        <button class="drill" onclick="go('Right-skewed — a tail pulling to the right')">Right-skewed</button>
+        <button class="drill" onclick="go('Left-skewed. The mean is pulled down by low scores')">Left-skewed</button>
+        <button class="drill" onclick="go('Right-skewed. A tail pulling to the right')">Right-skewed</button>
         <button class="drill" onclick="go('Walk me through the shape')">Walk me through it</button>
       </div>`;
     notebookTopic='Distribution Shape';
-    notebookBody='Mean (74) < Median (77) signals left skew — a few low scores pull the mean down while the median holds steady.';
+    notebookBody='Mean (74) < Median (77) signals left skew: a few low scores pull the mean down while the median holds steady.';
   } else if(isPValue){
     body=`<p>A p-value only makes sense inside a story. So let us start with one.</p>
-      <p>A campus health team claims their sleep program improves GPA. They test it on 40 students. The average gain is 0.3 points. <strong>Real — or just luck?</strong></p>
-      <div class="interp"><strong>StatSense asks →</strong> Before I define anything — what would convince you this result was not due to chance? What would you need to see?</div>`;
+      <p>A campus health team claims their sleep program improves GPA. They test it on 40 students. The average gain is 0.3 points. <strong>Real or just luck?</strong></p>
+      <div class="interp"><strong>StatSense asks →</strong> Before I define anything: what would convince you this result was not due to chance? What would you need to see?</div>`;
     notebookTopic='p-value Intuition';
     notebookBody='A p-value answers: if the null hypothesis were true, how surprising would this result be? Small p-value = surprising result = evidence against null.';
   } else if(isQuiz){
-    body=`<p>Drill mode. One question at a time — answer it, then we move forward.</p>
+    body=`<p>Drill mode. One question at a time. Answer it, then we move forward.</p>
       <p style="margin-top:12px;padding:12px 15px;background:var(--main-bg);border-radius:8px;border-left:2.5px solid var(--teal);font-weight:500;">
         A dataset has a mean of 50 and a standard deviation of 8. Roughly what percentage of values fall between 42 and 58?
       </p>
       <div class="drills">
-        <button class="drill" onclick="go('About 68% — one standard deviation either side')">About 68%</button>
+        <button class="drill" onclick="go('About 68%, one standard deviation either side')">About 68%</button>
         <button class="drill" onclick="go('About 95%')">About 95%</button>
         <button class="drill" onclick="go('About 50%')">About 50%</button>
         <button class="drill" onclick="go('I need a hint first')">Hint</button>
@@ -1384,8 +1443,8 @@ function respond(text){
     const greetings = {
       elementary: 'Great question! Let us look at this together.',
       middle: 'Good question. Let us build from what you already know.',
-      high: 'Every investigation starts with a real situation — one that makes the statistics feel worth knowing before we see a single formula.',
-      college: 'Every investigation starts with a real situation — one that makes the statistics feel worth knowing before we see a single formula.',
+      high: 'Every investigation starts with a real situation. One that makes the statistics feel worth knowing before we see a single formula.',
+      college: 'Every investigation starts with a real situation. One that makes the statistics feel worth knowing before we see a single formula.',
     };
     body=`<p>${greetings[currentGrade]}</p>
       <p>What are you trying to understand? A concept that did not click, a graph you cannot quite read, a dataset you want to explore, or a topic you need to lock in?</p>
@@ -1450,7 +1509,7 @@ function resetWelcome(){
   document.getElementById('chips').style.display='';
   document.getElementById('ta').value='';
   document.getElementById('ta').style.height='auto';
-  applyGradeConfig(currentGrade);
+  buildChips();
   inConv=false;
 }
 
@@ -1504,12 +1563,8 @@ function _enterApp(email){
   document.getElementById('s-av').textContent=displayName[0].toUpperCase();
   document.getElementById('s-uname').textContent=displayName;
 
-  // Set grade default based on level
-  if(currentLevel==='teacher') setGrade('college');
-  else setGrade('high');
-
-  // Build initial chips
-  buildChips(currentGrade);
+  // Build chips
+  buildChips();
 
   // Dismiss auth
   const auth=document.getElementById('auth-screen');
@@ -1530,9 +1585,142 @@ function updateFreeBar(){
 function showProModal(){ document.getElementById('pro-modal').classList.add('show'); }
 function closeProModal(){ document.getElementById('pro-modal').classList.remove('show'); }
 
+
+
+/* ════════════════════════════════════════════════════════════
+   CUSTOM INFO / PERSONALIZATION
+════════════════════════════════════════════════════════════ */
+let userSport = '';
+let userTopic = '';
+let userStruggle = '';
+let userCoach = '';
+let userCustomInfo = '';
+
+function openCustomInfo(){
+  document.getElementById('custom-sport').value = userSport;
+  document.getElementById('custom-info').value = userCustomInfo;
+  document.getElementById('custom-modal-bg').classList.add('show');
+}
+function closeCustomInfo(){
+  document.getElementById('custom-modal-bg').classList.remove('show');
+}
+function saveCustomInfo(){
+  userSport    = document.getElementById('custom-sport').value.trim();
+  userTopic    = document.getElementById('custom-topic')?.value.trim() || '';
+  userStruggle = document.getElementById('custom-struggle')?.value.trim() || '';
+  userCoach    = document.getElementById('custom-coach')?.value.trim() || '';
+  userCustomInfo = [userTopic, userStruggle, userCoach].filter(Boolean).join(' | ');
+  closeCustomInfo();
+
+  const btn = document.getElementById('custom-info-btn');
+  const lbl = document.getElementById('custom-btn-label');
+  if(userSport || userCustomInfo){
+    lbl.innerHTML = 'Personalized <span class="custom-active-dot"></span>';
+    btn.style.background = 'rgba(16,185,129,0.07)';
+    btn.style.borderColor = 'rgba(16,185,129,0.2)';
+    btn.style.color = '#065F46';
+    // Update placeholder to reflect their interest
+    const ta = document.getElementById('ta');
+    if(ta){
+      const hint = userSport ? 'Ask about '+userSport+', any concept, or stats problem…'
+                             : 'Ask about any graph, concept, dataset, or stats problem…';
+      ta.placeholder = hint;
+    }
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   FEEDBACK
+════════════════════════════════════════════════════════════ */
+function openFeedback(){ document.getElementById('feedback-modal').classList.add('show'); }
+function closeFeedback(){ document.getElementById('feedback-modal').classList.remove('show'); }
+function submitFeedback(){
+  const text = document.getElementById('feedback-text').value.trim();
+  if(!text){ document.getElementById('feedback-text').style.borderColor='#F43F5E'; return; }
+  // ── Send to Google Form ──────────────────────────────────
+  // Replace FORM_ID and ENTRY_ID with your actual Google Form values
+  // To get these: publish your form, click pre-fill, copy the entry IDs
+  const FORM_ID  = 'YOUR_GOOGLE_FORM_ID';
+  const ENTRY_ID = 'YOUR_ENTRY_ID';
+  const url = `https://docs.google.com/forms/d/e/${FORM_ID}/formResponse?${ENTRY_ID}=${encodeURIComponent(text)}&submit=Submit`;
+  fetch(url, {method:'POST', mode:'no-cors'}).catch(()=>{});
+  // ── Show confirmation ────────────────────────────────────
+  const modal = document.getElementById('feedback-modal');
+  modal.querySelector('.pro-modal').innerHTML = `
+    <div style="text-align:center;padding:20px 0;">
+      <div style="font-size:36px;margin-bottom:14px;">🙏</div>
+      <div style="font-size:17px;font-weight:600;color:#1C1917;margin-bottom:8px;">Thank you.</div>
+      <div style="font-size:13.5px;color:#78716C;line-height:1.65;margin-bottom:20px;">
+        Every response makes StatSense AI better for the next student.
+      </div>
+      <button onclick="closeFeedback()"
+        style="padding:10px 28px;background:#0E7490;border:none;border-radius:9px;
+               font-family:Sora,sans-serif;font-size:14px;font-weight:600;
+               color:#fff;cursor:pointer;">Close</button>
+    </div>`;
+}
+
 // Initialize chips on load
-buildChips('high');
+buildChips();
 
 </script>
+<!-- CUSTOM INFO MODAL -->
+<div class="custom-modal-bg" id="custom-modal-bg">
+  <div class="custom-modal">
+    <div class="custom-modal-title">Help StatSense coach you better.</div>
+    <div class="custom-modal-sub">Four quick questions. Your answers shape every session from here on.</div>
+
+    <div class="custom-field">
+      <label class="custom-label">1. What sport, hobby, or topic makes you lean forward?</label>
+      <input class="custom-input" id="custom-sport" type="text"
+        placeholder="soccer, basketball, music, cooking, finance, gaming…"/>
+    </div>
+
+    <div class="custom-field">
+      <label class="custom-label">2. What statistics topic are you working on right now?</label>
+      <input class="custom-input" id="custom-topic" type="text"
+        placeholder="e.g. hypothesis testing, normal distribution, regression…"/>
+    </div>
+
+    <div class="custom-field">
+      <label class="custom-label">3. Where does statistics usually lose you?</label>
+      <input class="custom-input" id="custom-struggle" type="text"
+        placeholder="e.g. p-values, standard deviation, reading graphs, word problems…"/>
+    </div>
+
+    <div class="custom-field" style="margin-bottom:20px;">
+      <label class="custom-label">4. What does your ideal stats coach do that your textbook never does?</label>
+      <textarea class="custom-ta" id="custom-coach" style="height:72px;"
+        placeholder="e.g. explains why before what, uses examples I care about, never just gives the answer…"></textarea>
+    </div>
+
+    <button class="custom-save" onclick="saveCustomInfo()">Save — let's get to work</button>
+    <button class="custom-cancel" onclick="closeCustomInfo()">Maybe later</button>
+  </div>
+</div>
+
+<!-- FEEDBACK MODAL -->
+<div class="pro-modal-bg" id="feedback-modal">
+  <div class="pro-modal" style="max-width:420px;text-align:left;">
+    <div style="font-size:22px;margin-bottom:10px;">💬</div>
+    <div class="pro-modal-title" style="text-align:left;">Quick feedback</div>
+    <div class="pro-modal-sub" style="text-align:left;margin-bottom:18px;">One question. 30 seconds. Helps us improve StatSense AI for every student.</div>
+    <div style="font-size:14px;font-weight:600;color:#1C1917;margin-bottom:10px;">What is one thing you would change or add to StatSense AI?</div>
+    <textarea id="feedback-text"
+      style="width:100%;padding:11px 13px;border:1.5px solid #E9E5DF;border-radius:9px;
+             font-family:Sora,sans-serif;font-size:13.5px;color:#1C1917;resize:none;
+             height:90px;outline:none;margin-bottom:14px;background:#fff;"
+      placeholder="Anything at all. What confused you, what helped, what you wish was here…"></textarea>
+    <button onclick="submitFeedback()"
+      style="width:100%;padding:11px;background:#0E7490;border:none;border-radius:9px;
+             font-family:Sora,sans-serif;font-size:14px;font-weight:600;color:#fff;
+             cursor:pointer;margin-bottom:9px;">Send Feedback</button>
+    <button onclick="closeFeedback()"
+      style="width:100%;padding:8px;border:1px solid #E9E5DF;border-radius:9px;
+             background:transparent;font-family:Sora,sans-serif;font-size:13px;
+             color:#78716C;cursor:pointer;">Maybe later</button>
+  </div>
+</div>
+
 </body>
 </html>
